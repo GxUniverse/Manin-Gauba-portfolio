@@ -2017,7 +2017,7 @@ function HomeContent() {
   const [muted, setMuted] = useState(true);
   const [vol, setVol] = useState(0.6);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // carousel state
   const photoSlides = [
@@ -3510,27 +3510,27 @@ function GalleryContent() {
 /* =========================
    SIMPLE PLACEHOLDERS
    ========================= */
-function ComingSoon({ title }) {
-  useEffect(() => {
-    document.title = `${title} — GX Universe`;
-  }, [title]);
-  return (
-    <div
-      style={{
-        display: "grid",
-        placeItems: "center",
-        height: "100%",
-        color: "#b5f8c1",
-        fontFamily: "VT323, monospace",
-        background: "#000",
-      }}
-    >
-      <div style={{ fontSize: "clamp(28px,5vw,56px)" }}>
-        {title} — Coming Soon
-      </div>
-    </div>
-  );
-}
+// function ComingSoon({ title }) {
+//   useEffect(() => {
+//     document.title = `${title} — GX Universe`;
+//   }, [title]);
+//   return (
+//     <div
+//       style={{
+//         display: "grid",
+//         placeItems: "center",
+//         height: "100%",
+//         color: "#b5f8c1",
+//         fontFamily: "VT323, monospace",
+//         background: "#000",
+//       }}
+//     >
+//       <div style={{ fontSize: "clamp(28px,5vw,56px)" }}>
+//         {title} — Coming Soon
+//       </div>
+//     </div>
+//   );
+// }
 
 /* =========================
    ROUTES
