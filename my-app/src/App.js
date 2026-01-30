@@ -16,9 +16,9 @@ const ASSET_BASE = process.env.REACT_APP_ASSET_BASE || "/assets";
 const asset = (p) =>
   `${ASSET_BASE}/${p.split("/").map(encodeURIComponent).join("/")}`;
 
-const HOME_LOGO_VIDEO = asset("logo TM repeat.m4v");
-const HOME_HERO_VIDEO = asset("home-boot.mp4");
-const MARKETING_LOGO_REEL = asset("logo TM repeat.m4v");
+const HOME_LOGO_VIDEO = asset("logo TM repeat.mp4");
+const HOME_HERO_VIDEO = asset("home-boot_1.mp4");
+const MARKETING_LOGO_REEL = asset("logo TM repeat.mp4");
 // ^ change this path/filename to whatever your actual logo video file is
 
 /* =========================
@@ -3038,7 +3038,7 @@ function GalleryContent() {
   const MEDIA = [
     // Videos used in the site
     {
-      id: "home-boot",
+      id: "home-boot_1",
       type: "video",
       src: HOME_LOGO_VIDEO,
       tag: "BOOT",
