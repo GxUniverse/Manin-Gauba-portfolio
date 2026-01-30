@@ -354,7 +354,7 @@ function CRTLayout({
       transform:translate(-50%, -50%); z-index:3;
     }
     .powerOn:hover{ transform: translateY(-3px) translateX(-50%) scale(1.05); filter: brightness(1.05);
-      box-shadow: 0 0 42px rgba(29,222,106,.55); }
+      box-shadow: 0 0 42px rgba(28,222,106,.55); }
 
     .screen-center{
       width:100%; height:100%; display:grid; place-items:center; padding: clamp(16px, 3vw, 40px);
