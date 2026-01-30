@@ -12,9 +12,6 @@ import {
 } from "react-router-dom";
 
 const ASSET_BASE = process.env.REACT_APP_ASSET_BASE || "/assets";
-const CALENDLY_URL =
-  process.env.REACT_APP_CALENDLY_URL ||
-  "https://calendly.com/YOUR_HANDLE/strategy-call";
 
 const asset = (p) =>
   `${ASSET_BASE}/${p.split("/").map(encodeURIComponent).join("/")}`;
