@@ -1,0 +1,4 @@
+# ignore big video assets
+my-app/public/assets/*.mp4
+my-app/public/assets/*.mov
+my-app/public/assets/*.m4v

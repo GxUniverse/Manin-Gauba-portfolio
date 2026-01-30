@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* --- CRT / 8-bit quest terminal --- */
+.crt {
+  font-family: 'Press Start 2P', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #23ff6c;
+  background: #001800;
+  border: 3px solid #1aff66;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  text-shadow: 0 0 6px rgba(35,255,108,.4), 0 0 12px rgba(35,255,108,.2);
+  box-shadow: inset 0 0 60px rgba(35,255,108,.08), 0 16px 40px rgba(0,0,0,.45);
+}
+.crt:before {
+  content:"";
+  position:absolute; inset:0; pointer-events:none; border-radius:9px;
+  background:
+    linear-gradient(rgba(35,255,108,.10), rgba(35,255,108,.0) 2px),
+    repeating-linear-gradient(transparent 0, transparent 2px, rgba(35,255,108,.06) 3px, transparent 4px);
+  opacity:.35;
+}
+.crt .title8 { font-size: 14px; letter-spacing: 1px; margin:0 0 12px 0; }
+.crt .quest {
+  display:flex; align-items:center; gap:12px; padding:10px 0;
+  border-bottom:1px solid rgba(35,255,108,.2);
+}
+.crt .quest:last-child { border-bottom:none; }
+
+.pixel-check {
+  width:18px; height:18px; background:#001800; border:3px solid #23ff6c; border-radius:4px;
+  box-shadow: inset 0 0 0 2px #001800;
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.pixel-check.checked { background:#23ff6c; color:#001800; }
+
+.pixel-btn {
+  font-family: 'Press Start 2P', ui-monospace, monospace;
+  font-size: 12px; padding:8px 10px; color:#001800; background:#23ff6c;
+  border:3px solid #23ff6c; border-radius:6px; cursor:pointer; letter-spacing:1px;
+}
+.pixel-btn.secondary { background:transparent; color:#23ff6c; border-color:#23ff6c; }
+
+.level8 { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.levelBadge {
+  display:flex; align-items:center; justify-content:center;
+  width:56px; height:56px; border:3px solid #23ff6c; border-radius:8px; background:#001800;
+  font-size:18px;
+}
+.levelCrown { font-size: 26px; filter: drop-shadow(0 0 6px rgba(35,255,108,.6)); }
+
+.xpbar8 { height:12px; border:3px solid #23ff6c; border-radius:6px; background:#001800; overflow:hidden; }
+.xpfill8 { height:100%; background:#23ff6c; width:0%; box-shadow:0 0 10px rgba(35,255,108,.6); }
+
+.small { font-size:10px; opacity:.85; }
