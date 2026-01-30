@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Manin-Gauba-portfolio/static/css/main.d4947c26.css",
+    "main.js": "/Manin-Gauba-portfolio/static/js/main.aad61f96.js",
+    "index.html": "/Manin-Gauba-portfolio/index.html",
+    "main.d4947c26.css.map": "/Manin-Gauba-portfolio/static/css/main.d4947c26.css.map",
+    "main.aad61f96.js.map": "/Manin-Gauba-portfolio/static/js/main.aad61f96.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d4947c26.css",
+    "static/js/main.aad61f96.js"
+  ]
+}
