@@ -1,6 +1,6 @@
 // src/App.js
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -20,14 +20,13 @@ const asset = (p) =>
 const HOME_LOGO_VIDEO = asset("logo TM repeat.mp4");
 const HOME_HERO_VIDEO = asset("home-boot_1.mp4");
 const MARKETING_LOGO_REEL = asset("logo TM repeat.mp4");
-// ^ change this path/filename to whatever your actual logo video file is
 
 /* =========================
    GLOBAL NAV CONFIG
    ========================= */
 const NAV_BUTTONS = [
   { key: "home", label: "Home", path: "/home" },
-  { key: "marketing", label: "Portfolio", path: "/marketing" }, // label only
+  { key: "marketing", label: "Portfolio", path: "/marketing" },
   { key: "Gallery", label: "Gallery", path: "/Gallery" },
   { key: "social-media", label: "Social Media", path: "/social-media" },
 ];
@@ -40,9 +39,186 @@ function getActiveIndex(pathname) {
   });
 }
 
+/* =========================
+   GENERIC IMAGE LIGHTBOX
+   - Used on Home, Social, Marketing
+   ========================= */
+function ImageLightbox({ open, src, alt, onClose, actionUrl, actionLabel }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="imgLightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image preview"
+      onMouseDown={onClose}
+    >
+      <div
+        className="imgLightboxInner"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div className="imgLightboxTop">
+          <div className="imgLightboxTitle">{alt || "Preview"}</div>
+
+          <div className="imgLightboxTopRight">
+            {actionUrl ? (
+              <a
+                className="imgLightboxAction"
+                href={actionUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {actionLabel || "OPEN"}
+              </a>
+            ) : null}
+
+            <button
+              type="button"
+              className="imgLightboxClose"
+              onClick={onClose}
+              aria-label="Close preview"
+            >
+              CLOSE
+            </button>
+          </div>
+        </div>
+
+        <div className="imgLightboxMedia">
+          <img src={src} alt={alt || "Preview"} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ===========================================
-   CRT LAYOUT (monitor + bezel + side buttons)
-   NOTE: Channel knob removed.
+   CHANNEL KNOB (GLOBAL OVERLAY)
+   =========================================== */
+function ChannelKnob({ powered, docked }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [docked, location.pathname]);
+
+  const isActive = (btnPath) => {
+    const p = location.pathname || "/";
+    if (btnPath === "/home") return p === "/" || p.startsWith("/home");
+    return p.startsWith(btnPath);
+  };
+
+  const ITEMS = [
+    { label: "Home", path: "/home", pos: "top" },
+    { label: "Portfolio", path: "/marketing", pos: "right" },
+    { label: "Gallery", path: "/Gallery", pos: "bottom" },
+    { label: "Social", path: "/social-media", pos: "left" },
+  ];
+
+  const go = (path) => {
+    if (!powered) return;
+    navigate(path);
+  };
+
+  const onEnter = () => {
+    if (!docked) return;
+    setOpen(true);
+  };
+  const onLeave = () => {
+    if (!docked) return;
+    setOpen(false);
+  };
+
+  const toggleOpen = () => {
+    if (!docked) return;
+    setOpen((v) => !v);
+  };
+
+  if (!powered) return null;
+
+  if (!docked) {
+    return (
+      <div className="ckFloat" aria-label="Channel knob navigation">
+        <div className="ckKnob" role="navigation" aria-label="Channel knob">
+          <div className="ckCore" aria-hidden="true" />
+          {ITEMS.map((it) => (
+            <button
+              key={it.path}
+              type="button"
+              className={`ckLabel ckLabel--${it.pos} ${
+                isActive(it.path) ? "active" : ""
+              }`}
+              onClick={() => go(it.path)}
+              aria-label={`Go to ${it.label}`}
+              title={it.label}
+            >
+              {it.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`ckDock ${open ? "isOpen" : ""}`}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      aria-label="Channel knob dock"
+    >
+      <button
+        type="button"
+        className="ckTab"
+        onClick={toggleOpen}
+        aria-expanded={open}
+        aria-label="Channel knob"
+        title="Channel knob"
+      >
+        CHANNEL KNOB
+      </button>
+
+      <div
+        className="ckPanel"
+        role="region"
+        aria-label="Channel knob panel"
+        aria-hidden={!open}
+      >
+        <div className="ckKnob" role="navigation" aria-label="Channel knob">
+          <div className="ckCore" aria-hidden="true" />
+          {ITEMS.map((it) => (
+            <button
+              key={it.path}
+              type="button"
+              className={`ckLabel ckLabel--${it.pos} ${
+                isActive(it.path) ? "active" : ""
+              }`}
+              onClick={() => go(it.path)}
+              aria-label={`Go to ${it.label}`}
+              title={it.label}
+            >
+              {it.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===========================================
+   CRT LAYOUT
    =========================================== */
 function CRTLayout({
   children,
@@ -70,9 +246,33 @@ function CRTLayout({
 
   const handlePowerOn = () => setPowered(true);
 
-  const css = `
-  /* ===== COMIC HEADLINE SYSTEM ===== */
+  const scrollRef = useRef(null);
+  const [knobDocked, setKnobDocked] = useState(false);
 
+  useEffect(() => {
+    setKnobDocked(false);
+
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = el.scrollTop || 0;
+        setKnobDocked(y > 30);
+        ticking = false;
+      });
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [location.pathname]);
+
+  const css = `
   @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@600;700&display=swap');
 
@@ -89,13 +289,19 @@ function CRTLayout({
 
     --chromeH: 90px;
 
-    /* shared page vars */
     --text:#e9edf1;
     --muted:#a6b0c0;
     --mk-stroke:#1b2230;
     --accent-ink:#052a15;
     --grid: min(1400px, 94%);
-    --block-gap: 48px;
+
+    --ck-size: 240px;
+    --ck-bottom: 22px;
+    --ck-tab-h: 34px;
+    --ck-tab-w: 160px;
+
+    --ck-size-m: 150px;
+    --ck-bottom-m: 10px;
   }
 
   *{ box-sizing:border-box }
@@ -105,92 +311,6 @@ function CRTLayout({
     background: var(--roomSolid);
     color:var(--ink);
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  }
-
-  /* ============== ARCADE GLOW SYSTEM ============== */
-  @keyframes glowHue {
-    0%   { --g1:#b58cff; --g2:#7e5cff; --ring:rgba(181,140,255,.65); }
-    25%  { --g1:#ff6c6c; --g2:#ff2e2e; --ring:rgba(255,46,46,.65); }
-    50%  { --g1:#7dffb2; --g2:#1dde6a; --ring:rgba(29,222,106,.65); }
-    75%  { --g1:#88c8ff; --g2:#2e91ff; --ring:rgba(46,145,255,.65); }
-    100% { --g1:#b58cff; --g2:#7e5cff; --ring:rgba(181,140,255,.65); }
-  }
-
-  .glow-cycle{
-    animation: glowHue 6s linear infinite;
-    background: linear-gradient(180deg, var(--g1), var(--g2));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color: transparent;
-    text-shadow:
-      0 0 10px var(--ring),
-      0 0 22px color-mix(in oklab, var(--g2) 65%, black),
-      0 0 36px color-mix(in oklab, var(--g2) 45%, black);
-    filter: saturate(1.15) brightness(1.02);
-  }
-
-  .glow-cycle-sub{
-    animation: glowHue 6s linear infinite;
-    color: color-mix(in oklab, var(--g1) 85%, white);
-    text-shadow:
-      0 0 6px var(--ring),
-      0 0 14px color-mix(in oklab, var(--g2) 55%, black);
-    letter-spacing:.01em;
-  }
-
-  .arcade-card{
-    position:relative;
-    background:#000;
-    border-radius:16px;
-    border:1px solid #111;
-    overflow:clip;
-    isolation:isolate;
-  }
-  .arcade-card::before{
-    content:"";
-    position:absolute; inset:-2px;
-    border-radius:inherit;
-    background:
-      conic-gradient(from 0deg,
-        #b58cff,
-        #ff2e2e,
-        #1dde6a,
-        #2e91ff,
-        #b58cff);
-    filter: blur(14px);
-    opacity:.65;
-    z-index:-1;
-    animation: spinRing 8s linear infinite;
-  }
-  .arcade-card::after{
-    content:"";
-    position:absolute; inset:0;
-    border-radius:inherit;
-    padding:1px;
-    background:
-      conic-gradient(from 0deg,
-        #b58cff,
-        #ff2e2e,
-        #1dde6a,
-        #2e91ff,
-        #b58cff);
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    animation: spinRing 8s linear infinite reverse;
-    opacity:.9;
-  }
-  @keyframes spinRing{
-    to{ transform: rotate(360deg) }
-  }
-
-  .arcade-card .inner{
-    background: radial-gradient(120% 150% at 50% -20%,
-      color-mix(in oklab, var(--g2, #1dde6a) 12%, transparent) 0%,
-      transparent 42%);
-    border-radius:inherit;
   }
 
   /* ========= BASE LAYOUT ========= */
@@ -232,7 +352,7 @@ function CRTLayout({
     margin: 2px auto 0;
     border-radius: 18px / 10px;
     background: linear-gradient(180deg, var(--bezel2), #bfb7aa);
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(0,0,0,.22), 0 12px 36px rgba(0,0,0,.55);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 6px rgba(0,0,0,.22), 0 12px 36px rgba(0,0,0,.55);
   }
 
   .screen{
@@ -284,9 +404,7 @@ function CRTLayout({
     -webkit-overflow-scrolling: touch;
     position:relative;
     z-index:2;
-
-    /* knob removed -> normal safe padding */
-    padding-bottom: 28px;
+    padding-bottom: 110px;
   }
 
   .sideDock{ position:absolute; top:50%; transform: translateY(-50%);
@@ -330,18 +448,241 @@ function CRTLayout({
     letter-spacing: .06em;
   }
 
-  @media (max-width: 980px){
-    .ctrlBtn{ min-width: 150px; padding: 7px 9px; }
-    .sideDock.left .ctrlBtn{ transform: translateX(calc(-100% + 24px)); }
-    .sideDock.right .ctrlBtn{ transform: translateX(calc(100% - 24px)); }
+  /* ==========================
+     CHANNEL KNOB STYLES
+     ========================== */
+  .ckFloat{
+    position: fixed;
+    left: 50%;
+    bottom: var(--ck-bottom);
+    transform: translateX(-50%);
+    z-index: 1500;
+    pointer-events: auto;
   }
-  @media (max-width: 720px){
-    .ctrlBtn{ min-width: 132px; padding: 6px 8px; }
-    .sideDock.left .ctrlBtn{ transform: translateX(calc(-100% + 22px)); }
-    .sideDock.right .ctrlBtn{ transform: translateX(calc(100% - 22px)); }
+  .ckKnob{
+    width: var(--ck-size);
+    height: var(--ck-size);
+    position: relative;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 18px 40px rgba(0,0,0,.65));
+  }
+  .ckCore{
+    width: 58%;
+    height: 58%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,.28), rgba(255,255,255,0) 40%),
+      radial-gradient(circle at 50% 60%, #3b3b3b, #121212 62%, #070707 100%);
+    border: 2px solid rgba(255,255,255,.18);
+    box-shadow:
+      inset 0 10px 18px rgba(255,255,255,.08),
+      inset 0 -14px 22px rgba(0,0,0,.62),
+      0 0 18px rgba(29,222,106,.25);
+    position: relative;
+  }
+  .ckCore::after{
+    content:"";
+    position:absolute;
+    inset: 12%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 40% 30%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%),
+      radial-gradient(circle at 50% 55%, rgba(29,222,106,.22), rgba(0,0,0,0) 60%);
+    border: 1px solid rgba(255,255,255,.10);
   }
 
-  /* ===== HERO / HOME ===== */
+  .ckLabel{
+    position:absolute;
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    pointer-events:auto;
+
+    padding: 10px 12px 9px;
+    min-width: 108px;
+
+    background-color: #d6d7cd;
+    background-image:
+      linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,0) 42%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0 2px, rgba(0,0,0,0) 2px 6px);
+
+    border: 2px solid rgba(0,0,0,.7);
+    border-radius: 10px;
+    box-shadow:
+      0 10px 22px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.35);
+
+    font: 900 12px/1 Inter;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #111;
+    text-align:center;
+
+    transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+    user-select:none;
+  }
+  .ckLabel:hover{
+    transform: translate(-50%, -50%) scale(1.03);
+    filter: brightness(1.05);
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.65),
+      0 0 18px rgba(29,222,106,.18);
+  }
+  .ckLabel.active{
+    background-color: #ffd84d;
+    border-color: #050505;
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.65),
+      0 0 18px rgba(255,216,77,.35);
+  }
+  .ckLabel--top{ top: 6%; left: 50%; transform: translate(-50%, -50%) rotate(-2deg); }
+  .ckLabel--right{ top: 50%; left: 94%; transform: translate(-50%, -50%) rotate(2deg); }
+  .ckLabel--bottom{ top: 94%; left: 50%; transform: translate(-50%, -50%) rotate(1deg); }
+  .ckLabel--left{ top: 50%; left: 6%; transform: translate(-50%, -50%) rotate(-1deg); }
+
+  .ckDock{
+    position: fixed;
+    left: 50%;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 1500;
+    pointer-events: auto;
+    width: var(--ck-tab-w);
+    height: var(--ck-tab-h);
+  }
+  .ckTab{
+    position: relative;
+    z-index: 2;
+    appearance:none;
+    border: 2px solid rgba(0,0,0,.7);
+    background: linear-gradient(180deg, #bdb6ac, #a89f90);
+    border-radius: 999px;
+    width: var(--ck-tab-w);
+    height: var(--ck-tab-h);
+    cursor: pointer;
+    font: 900 11px/1 Inter;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #2e2a23;
+    box-shadow:
+      0 12px 26px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .ckTab:hover{ filter: brightness(1.05); }
+
+  .ckPanel{
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--ck-tab-h) + 8px);
+    transform: translateX(-50%) translateY(24px);
+    opacity: 0;
+    pointer-events: none;
+
+    width: var(--ck-size);
+    height: var(--ck-size);
+    display:grid;
+    place-items:center;
+
+    transition: transform .22s ease, opacity .22s ease;
+    z-index: 1;
+  }
+  .ckDock.isOpen .ckPanel{
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 720px){
+    .ckFloat{ bottom: var(--ck-bottom-m); }
+    .ckKnob{ width: var(--ck-size-m); height: var(--ck-size-m); }
+    .ckPanel{ width: var(--ck-size-m); height: var(--ck-size-m); }
+    .ckLabel{ min-width: 86px; padding: 8px 10px 7px; font-size: 10px; letter-spacing: .16em; }
+    .ckDock{ bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+    .ckTab{ width: 150px; height: 32px; font-size: 10px; }
+  }
+
+  /* ==========================
+     NEW IMAGE LIGHTBOX (GLOBAL)
+     ========================== */
+  .imgLightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 2600;
+    background: rgba(0,0,0,.84);
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .imgLightboxInner{
+    width: min(1200px, 96vw);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.14);
+    background: #000;
+    box-shadow: 0 30px 120px rgba(0,0,0,.95);
+  }
+  .imgLightboxTop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.6);
+  }
+  .imgLightboxTitle{
+    font: 800 14px/1.2 Inter;
+    color: #e9edf1;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .imgLightboxTopRight{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:flex-end;
+  }
+  .imgLightboxAction{
+    text-decoration:none;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.55);
+    color:#e9edf1;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font: 900 12px/1 Inter;
+    letter-spacing:.12em;
+    text-transform: uppercase;
+  }
+  .imgLightboxAction:hover{ filter: brightness(1.08); }
+  .imgLightboxClose{
+    appearance:none;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.55);
+    color:#e9edf1;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font: 900 12px/1 Inter;
+    letter-spacing:.12em;
+    text-transform: uppercase;
+    cursor:pointer;
+  }
+  .imgLightboxClose:hover{ filter: brightness(1.08); }
+  .imgLightboxMedia{
+    width:100%;
+    height: min(78vh, 820px);
+    background:#000;
+    display:block;
+  }
+  .imgLightboxMedia img{
+    width:100%;
+    height:100%;
+    object-fit: contain;
+    display:block;
+  }
+
+  /* ===== HOME ===== */
   .h_wrap{ min-height:100%; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; color:#e8efe9; }
   .h_hero{
     position: relative; width: 100%; min-height: calc(100svh - var(--chromeH));
@@ -404,23 +745,6 @@ function CRTLayout({
     50%{ transform: translateY(8px) rotate(45deg); opacity:1 }
   }
 
-  /* ===== COMIC HEADLINE (SAFE ADDITION) ===== */
-  .comicHead{
-    display:inline-block;
-    font-family: "VT323", ui-monospace, monospace;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    padding: .35em .55em .3em;
-    background: #ffd84d;
-    color: #111;
-    border-radius: 12px;
-    border: 3px solid #050505;
-    box-shadow:
-      0 4px 0 #050505,
-      0 10px 26px rgba(0,0,0,.45);
-    transform: none;
-  }
-
   .h_audioWrap{
     position:absolute; right: clamp(10px, 1.6vw, 18px); bottom: clamp(10px, 1.6vw, 18px);
     display:flex; align-items:center; gap:10px; z-index:2; background: rgba(0,0,0,.55); backdrop-filter: blur(6px);
@@ -457,7 +781,6 @@ function CRTLayout({
     font: 800 clamp(16px, 2.2vw, 22px)/1.25 "Space Grotesk", Inter;
     color:#bfe8c7; text-align:center;
   }
-
   .h_titleMain{
     font: 900 clamp(24px, 3.6vw, 38px)/1.15 "Space Grotesk", Inter;
     margin:0; color:#ecf1ff; text-align:center;
@@ -466,24 +789,6 @@ function CRTLayout({
     margin:6px 0 0;
     font: 800 clamp(16px, 2.2vw, 22px)/1.25 "Space Grotesk", Inter;
     color:#c9d7ff; text-align:center;
-  }
-
-  /* Shared image card base */
-  .h_imgCard{
-    position:relative;
-    border-radius:14px;
-    overflow:hidden;
-    border:none;
-    background:#000;
-    height: clamp(220px, 40vh, 420px);
-    box-shadow: 0 16px 38px rgba(0,0,0,.6);
-  }
-  .h_imgCard img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    background:#000;
-    display:block;
   }
 
   .h_centerNote{
@@ -511,7 +816,6 @@ function CRTLayout({
     color:#cfe0d4;
   }
 
-  /* ===== HOME CAROUSEL ===== */
   .h_carouselWrap{
     margin-top: 16px;
     display:flex;
@@ -519,7 +823,6 @@ function CRTLayout({
     align-items:center;
     gap: 14px;
   }
-
   .h_carousel{
     width:100%;
     display:flex;
@@ -546,6 +849,23 @@ function CRTLayout({
     filter: blur(0.2px);
     transition: opacity .2s ease, transform .2s ease;
   }
+
+  .h_imgCard{
+    position:relative;
+    border-radius:14px;
+    overflow:hidden;
+    border:none;
+    background:#000;
+    height: clamp(220px, 40vh, 420px);
+    box-shadow: 0 16px 38px rgba(0,0,0,.6);
+  }
+  .h_imgCard img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    background:#000;
+    display:block;
+  }
   .h_imgCard--carousel{
     display:flex;
     flex-direction:column;
@@ -553,6 +873,9 @@ function CRTLayout({
   }
   .h_imgCard--side img{
     object-fit:cover;
+  }
+  .h_imgClickable{
+    cursor: pointer;
   }
 
   .h_carCaption{
@@ -617,7 +940,6 @@ function CRTLayout({
     border:1px solid #1dde6a;
     opacity:.4;
     cursor:pointer;
-    box-shadow: 0 0 0 rgba(0,0,0,0);
     transition: opacity .15s ease, transform .15s ease, box-shadow .15s ease, background .15s ease;
   }
   .h_carDot.active{
@@ -626,7 +948,6 @@ function CRTLayout({
     transform: scale(1.15);
     box-shadow: 0 0 10px rgba(29,222,106,.9);
   }
-
   @media (max-width: 880px){
     .h_carFrame--side{ display:none; }
     .h_carFrame--center{ flex:1 1 auto; max-width: 100%; }
@@ -668,11 +989,7 @@ function CRTLayout({
     color: var(--muted);
     font: 500 15px/1.7 Inter;
   }
-
-  .cg-shell{
-    width:var(--grid);
-    margin: 18px auto 30px;
-  }
+  .cg-shell{ width:var(--grid); margin: 18px auto 30px; }
 
   .cg-controls{
     display:flex;
@@ -682,11 +999,7 @@ function CRTLayout({
     flex-wrap:wrap;
     margin-bottom:12px;
   }
-  .cg-pillRow{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-  }
+  .cg-pillRow{ display:flex; flex-wrap:wrap; gap:8px; }
   .cg-pill{
     appearance:none;
     border:1px solid var(--mk-stroke);
@@ -707,18 +1020,13 @@ function CRTLayout({
     box-shadow: 0 0 16px rgba(29,222,106,.22);
     opacity:1;
   }
-
-  .cg-count{
-    color: var(--muted);
-    font: 700 13px/1.2 Inter;
-  }
+  .cg-count{ color: var(--muted); font: 700 13px/1.2 Inter; }
 
   .cg-grid{
     display:grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 12px;
   }
-
   .cg-card{
     position:relative;
     border-radius: 16px;
@@ -735,13 +1043,7 @@ function CRTLayout({
     border-color: rgba(255,255,255,.22);
     box-shadow: 0 28px 80px rgba(0,0,0,.85);
   }
-
-  .cg-media{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
+  .cg-media{ width:100%; height:100%; object-fit:cover; display:block; }
 
   .cg-overlay{
     position:absolute;
@@ -765,30 +1067,25 @@ function CRTLayout({
     color:#dfe7e0;
   }
 
-  /* Responsive panel sizes */
   .cg-span-3{ grid-column: span 3; }
   .cg-span-4{ grid-column: span 4; }
-  .cg-span-5{ grid-column: span 5; }
   .cg-span-6{ grid-column: span 6; }
-  .cg-span-7{ grid-column: span 7; }
-  .cg-span-8{ grid-column: span 8; }
   .cg-span-12{ grid-column: span 12; }
 
   @media (max-width: 1100px){
     .cg-grid{ grid-template-columns: repeat(8, minmax(0, 1fr)); }
-    .cg-span-7, .cg-span-8{ grid-column: span 8; }
     .cg-span-6{ grid-column: span 8; }
-    .cg-span-5{ grid-column: span 4; }
     .cg-span-4{ grid-column: span 4; }
     .cg-span-3{ grid-column: span 4; }
+    .cg-span-12{ grid-column: span 8; }
   }
   @media (max-width: 720px){
     .cg-grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .cg-span-12, .cg-span-8, .cg-span-7, .cg-span-6, .cg-span-5, .cg-span-4, .cg-span-3{ grid-column: span 4; }
+    .cg-span-12, .cg-span-6, .cg-span-4, .cg-span-3{ grid-column: span 4; }
     .cg-card{ min-height: 220px; }
   }
 
-  /* Lightbox */
+  /* Gallery Lightbox (existing) */
   .cg-lightbox{
     position:fixed;
     inset:0;
@@ -815,10 +1112,7 @@ function CRTLayout({
     border-bottom:1px solid rgba(255,255,255,.10);
     background: rgba(0,0,0,.6);
   }
-  .cg-lightboxTopLeft{
-    display:grid;
-    gap:2px;
-  }
+  .cg-lightboxTopLeft{ display:grid; gap:2px; }
   .cg-lightboxKicker{
     margin:0;
     font: 900 11px/1.2 Inter;
@@ -844,7 +1138,6 @@ function CRTLayout({
     cursor:pointer;
   }
   .cg-close:hover{ filter: brightness(1.08); }
-
   .cg-lightboxMedia{
     width:100%;
     height: min(70vh, 720px);
@@ -859,7 +1152,7 @@ function CRTLayout({
     display:block;
   }
 
-  /* ===== SOCIAL MEDIA PAGE (NEW) ===== */
+  /* ===== SOCIAL MEDIA PAGE (kept, with tiles clickable) ===== */
   .sm-wrap{
     min-height:100%;
     display:flex;
@@ -867,18 +1160,8 @@ function CRTLayout({
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     color: var(--text);
   }
-  .sm-hero{
-    display:grid;
-    place-items:center;
-    padding: 32px 0 10px;
-    text-align:center;
-  }
-  .sm-hero-inner{
-    width:var(--grid);
-    display:grid;
-    gap:12px;
-    margin-inline:auto;
-  }
+  .sm-hero{ display:grid; place-items:center; padding: 32px 0 10px; text-align:center; }
+  .sm-hero-inner{ width:var(--grid); display:grid; gap:12px; margin-inline:auto; }
   .sm-h1{
     font: 800 clamp(32px,5.8vw,60px)/1.1 "Space Grotesk", Inter;
     letter-spacing:-.02em;
@@ -896,12 +1179,7 @@ function CRTLayout({
     font: 500 15px/1.7 Inter;
     text-align:center;
   }
-
-  .sm-section{
-    width:var(--grid);
-    margin: 26px auto 0;
-    padding-bottom:6px;
-  }
+  .sm-section{ width:var(--grid); margin: 26px auto 0; padding-bottom:6px; }
 
   .sm-carouselShell{
     background:#000;
@@ -917,23 +1195,10 @@ function CRTLayout({
     gap:12px;
     padding: 14px 14px 0;
   }
-  .sm-carouselTitle{
-    margin:0;
-    font: 800 18px/1.2 Inter;
-    color: var(--text);
-    text-align:left;
-  }
-  .sm-carouselHint{
-    margin:0;
-    font: 600 12px/1.2 Inter;
-    color: var(--muted);
-    text-align:right;
-  }
+  .sm-carouselTitle{ margin:0; font: 800 18px/1.2 Inter; color: var(--text); text-align:left; }
+  .sm-carouselHint{ margin:0; font: 600 12px/1.2 Inter; color: var(--muted); text-align:right; }
 
-  .sm-carousel{
-    position:relative;
-    padding: 12px 14px 14px;
-  }
+  .sm-carousel{ position:relative; padding: 12px 14px 14px; }
   .sm-carouselRow{
     display:grid;
     grid-auto-flow: column;
@@ -965,12 +1230,7 @@ function CRTLayout({
     border-color: rgba(255,255,255,.25);
     box-shadow: 0 18px 50px rgba(0,0,0,.85);
   }
-  .sm-tile img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
+  .sm-tile img{ width:100%; height:100%; object-fit:cover; display:block; }
   .sm-tileOverlay{
     position:absolute;
     inset:auto 10px 10px 10px;
@@ -987,18 +1247,9 @@ function CRTLayout({
     color: #b5f8c1;
     margin:0 0 4px;
   }
-  .sm-tileCap{
-    margin:0;
-    color:#dfe7e0;
-    font: 600 13px/1.45 Inter;
-  }
+  .sm-tileCap{ margin:0; color:#dfe7e0; font: 600 13px/1.45 Inter; }
 
-  .sm-actions{
-    display:flex;
-    gap:10px;
-    justify-content:flex-end;
-    padding: 0 14px 14px;
-  }
+  .sm-actions{ display:flex; gap:10px; justify-content:flex-end; padding: 0 14px 14px; }
   .sm-btn{
     appearance:none;
     border:1px solid #1a2a20;
@@ -1043,16 +1294,8 @@ function CRTLayout({
     text-transform:uppercase;
     color: #b5f8c1;
   }
-  .sm-cardTitle{
-    margin:0 0 8px;
-    font: 800 18px/1.25 Inter;
-    color: var(--text);
-  }
-  .sm-cardBody{
-    margin:0;
-    color: var(--muted);
-    font: 500 14px/1.7 Inter;
-  }
+  .sm-cardTitle{ margin:0 0 8px; font: 800 18px/1.25 Inter; color: var(--text); }
+  .sm-cardBody{ margin:0; color: var(--muted); font: 500 14px/1.7 Inter; }
 
   @media (max-width: 980px){
     .sm-cards{ grid-template-columns: 1fr; }
@@ -1061,7 +1304,7 @@ function CRTLayout({
 
   .sm-footer{
     width:var(--grid);
-    margin: 28px auto 30px;
+    margin: 28px auto 34px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -1069,6 +1312,7 @@ function CRTLayout({
     flex-wrap:wrap;
     text-align:center;
   }
+
   .sm-pill{
     display:inline-flex;
     align-items:center;
@@ -1096,16 +1340,76 @@ function CRTLayout({
     box-shadow: 0 0 10px rgba(29,222,106,.55);
   }
 
-  .mk-hero{ display:grid; place-items:center; padding: 32px 0 8px; text-align:center; }
-  .mk-hero-inner{ width:var(--grid); display:grid; gap:14px; text-align:center; margin-inline:auto; }
-  .mk-h1{ font: 800 clamp(32px,5.8vw,60px)/1.1 "Space Grotesk", Inter; letter-spacing:-.02em; margin:0; background: linear-gradient(180deg, #ffffff, #d8e3d9); color: yellow; background-clip:text; }
-  .mk-bullets{ width:var(--grid); display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 18px; list-style:none; padding:0; margin: 12px auto 0; text-align:left; }
-  .mk-bullets li{ display:flex; align-items:flex-start; gap:10px; font: 700 clamp(16px, 1.8vw, 18px)/1.5 Inter; color: var(--text); }
-  .dot{ width:9px; height:9px; border-radius:50%; margin-top:8px; flex:none; background: var(--accent); box-shadow: 0 0 10px rgba(29,222,106,.6), 0 0 2px rgba(29,222,106,.9) inset; }
-  @media (max-width: 980px){ .mk-bullets{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 640px){ .mk-bullets{ grid-template-columns: 1fr; } }
+  /* ===== SOCIAL CONTACT SECTION (NEW) ===== */
+  .sm-contact{
+    width:var(--grid);
+    margin: 10px auto 36px;
+    display:grid;
+    gap: 14px;
+    text-align:center;
+  }
+  .sm-contactCard{
+    background:#000;
+    border:1.5px solid var(--mk-stroke);
+    border-radius: 18px;
+    padding: 18px 18px 20px;
+    box-shadow: 0 22px 70px rgba(0,0,0,.75);
+    display:grid;
+    gap: 10px;
+    place-items:center;
+  }
+  .sm-contactTitle{
+    margin:0;
+    font: 900 22px/1.15 "Space Grotesk", Inter;
+    color: var(--text);
+    letter-spacing:-.01em;
+  }
+  .sm-contactSub{
+    margin:0;
+    max-width: 72ch;
+    color: var(--muted);
+    font: 500 14px/1.7 Inter;
+  }
+  .sm-contactActions{
+    display:flex;
+    gap: 10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top: 6px;
+  }
+  .sm-contactBtn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border:1px solid #1a2a20;
+    background:#0e1511;
+    color: var(--text);
+    text-decoration:none;
+    font: 900 13px/1 Inter;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, border-color .12s ease;
+    box-shadow: 0 14px 34px rgba(0,0,0,.55);
+  }
+  .sm-contactBtn:hover{
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    border-color: rgba(255,255,255,.22);
+    box-shadow: 0 18px 46px rgba(0,0,0,.8);
+  }
+  .sm-contactBtnPrimary{
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color:#1dd86a;
+    box-shadow: 0 10px 26px rgba(29,222,106,.18);
+  }
 
-  /* ===== MARKETING ===== */
+
+  /* ===== PORTFOLIO / MARKETING (minimal needed styles kept) ===== */
   .mk-wrap{ min-height:100%; display:flex; flex-direction:column; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--text) }
   .mk-nav{ width:100%; display:flex; justify-content:center; backdrop-filter: blur(6px); position:sticky; top:0; z-index:1; background: rgba(0,0,0,.65); border-bottom:1px solid var(--mk-stroke); }
   .mk-nav-inner{ width:var(--grid); display:flex; align-items:center; gap:16px; padding:12px 2px; }
@@ -1115,159 +1419,65 @@ function CRTLayout({
   .mk-link:hover{ color: var(--text); }
   .mk-cta{ background: var(--accent); color: var(--accent-ink); border:1px solid #1dd86a; border-radius: 999px; padding:10px 16px; font: 700 14px/1 Inter; box-shadow: 0 8px 30px rgba(29,222,106,.25); text-decoration:none; }
 
-  /* ===== FULL-WIDTH LOGO REEL HERO (matches brand carousel width) ===== */
-  .mk-logoReelWrap{
-    margin-top: 18px;
-    width: var(--grid);
-    margin-left: auto;
-    margin-right: auto;
+  .mk-hero{ display:grid; place-items:center; padding: 80px 0 12px; text-align:center; }
+  .mk-hero-inner{ width:var(--grid); display:grid; gap:14px; text-align:center; margin-inline:auto; }
+
+  .mk-h1{
+    font: 800 clamp(32px,5.8vw,60px)/1.1 "Space Grotesk", Inter;
+    letter-spacing:-.02em;
+    margin:0;
+    background: linear-gradient(180deg, #ffffff, #d8e3d9);
+    color: transparent;
+    background-clip:text;
   }
 
+  .comicHead{
+    display:inline-block;
+    font-family: "VT323", ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: .35em .55em .3em;
+    background: #ffd84d;
+    color: #111;
+    border-radius: 12px;
+    border: 3px solid #050505;
+    box-shadow: 0 4px 0 #050505, 0 10px 26px rgba(0,0,0,.45);
+  }
+
+  .mk-bullets{ width:var(--grid); display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 18px; list-style:none; padding:0; margin: 12px auto 0; text-align:left; }
+  .mk-bullets li{ display:flex; align-items:flex-start; gap:10px; font: 700 clamp(16px, 1.8vw, 18px)/1.5 Inter; color: var(--text); }
+  .dot{ width:9px; height:9px; border-radius:50%; margin-top:8px; flex:none; background: var(--accent); box-shadow: 0 0 10px rgba(29,222,106,.6), 0 0 2px rgba(29,222,106,.9) inset; }
+  @media (max-width: 980px){ .mk-bullets{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px){ .mk-bullets{ grid-template-columns: 1fr; } }
+
+  .mk-ctaRow{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin: 48px auto; }
+  .mk-btn{ background: var(--accent); color: var(--accent-ink); border:1px solid #1dd86a; padding:12px 16px; border-radius:12px; font: 700 14px/1 Inter; text-decoration:none; }
+
+  .mk-section{ width:var(--grid); margin: 48px auto 0; padding-bottom:6px; text-align:center; }
+  .mk-h2{ font: 800 clamp(22px,3vw,34px)/1.15 "Space Grotesk", Inter; letter-spacing:-.01em; margin:0 0 6px }
+
+  .mk-logoReelWrap{ margin-top: -50px; width: var(--grid); margin-left:auto; margin-right:auto; }
   .mk-logoReelFrame{
-    position: relative;
-    width: 100%;
+    position: relative; width: 100%;
     height: clamp(220px, 34vh, 420px);
     border-radius: 18px;
     overflow: hidden;
     background:#000;
     border:1.5px solid var(--mk-stroke);
-    box-shadow:
-      0 22px 70px rgba(0,0,0,.85),
-      0 0 22px rgba(0,0,0,.75);
+    box-shadow: 0 22px 70px rgba(0,0,0,.85), 0 0 22px rgba(0,0,0,.75);
   }
-
-  .mk-logoReelFrame video{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit: cover;
-    display:block;
-  }
-
+  .mk-logoReelFrame video{ position:absolute; inset:0; width:100%; height:100%; object-fit: cover; display:block; }
   .mk-logoReelFrame::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:
-      radial-gradient(80% 80% at 50% 40%, rgba(0,0,0,.10), rgba(0,0,0,.75)),
+    content:""; position:absolute; inset:0;
+    background: radial-gradient(80% 80% at 50% 40%, rgba(0,0,0,.10), rgba(0,0,0,.75)),
       linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25) 45%, rgba(0,0,0,.70));
     z-index:1;
   }
-
-  .mk-logoOverlay{
-    position:absolute;
-    inset:0;
-    z-index:2;
-    display:grid;
-    place-items:center;
-    text-align:center;
-    padding: 18px 16px;
-  }
-
+  .mk-logoOverlay{ position:absolute; inset:0; z-index:2; display:grid; place-items:center; text-align:center; padding: 18px 16px; }
   .mk-logoOverlayInner{ width:min(920px, 92%); }
+  .mk-logoOverlayH2{ margin:0; font: 800 clamp(24px, 3.2vw, 38px)/1.15 "Space Grotesk", Inter; letter-spacing:-.01em; color: var(--text); text-shadow: 0 10px 34px rgba(0,0,0,.65); }
+  .mk-logoOverlayP{ margin: 10px auto 0; max-width: 72ch; color: color-mix(in oklab, var(--muted) 82%, white); font: 500 15px/1.7 Inter; text-shadow: 0 10px 30px rgba(0,0,0,.65); }
 
-  .mk-logoOverlayH2{
-    margin:0;
-    font: 800 clamp(24px, 3.2vw, 38px)/1.15 "Space Grotesk", Inter;
-    letter-spacing:-.01em;
-    color: var(--text);
-    text-shadow: 0 10px 34px rgba(0,0,0,.65);
-  }
-
-  .mk-logoOverlayP{
-    margin: 10px auto 0;
-    max-width: 72ch;
-    color: color-mix(in oklab, var(--muted) 82%, white);
-    font: 500 15px/1.7 Inter;
-    text-shadow: 0 10px 30px rgba(0,0,0,.65);
-  }
-
-  .mk-ctaRow{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin: var(--block-gap) auto; }
-  .mk-btn{ background: var(--accent); color: var(--accent-ink); border:1px solid #1dd86a; padding:12px 16px; border-radius:12px; font: 700 14px/1 Inter; text-decoration:none; }
-
-  .mk-section{ width:var(--grid); margin: var(--block-gap) auto 0; padding-bottom:6px; text-align:center; }
-  .mk-h2{ font: 800 clamp(22px,3vw,34px)/1.15 "Space Grotesk", Inter; letter-spacing:-.01em; margin:0 0 6px }
-
-  .mk-pricing{ display:grid; gap:24px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); margin-top:24px; align-items:stretch; }
-  .tier{ background:#000; border:1.5px solid var(--mk-stroke); border-radius: 20px; padding: 24px 24px 22px; position:relative; box-shadow: 0 28px 80px rgba(0,0,0,.6); text-align:left; }
-  .tier h3{ margin:0 0 8px; font: 800 clamp(20px, 2.2vw, 26px)/1 Inter; }
-  .price{ font: 800 clamp(32px, 4.6vw, 44px)/1 "Space Grotesk", Inter; margin: 6px 0 4px; }
-  .tiny{ color: var(--muted); font: 600 clamp(13px, 1.4vw, 16px)/1.5 Inter; }
-  .tier ul{ margin:16px 0 18px; padding-left:22px; color: var(--muted); font: 500 clamp(15px, 1.6vw, 18px)/1.7 Inter; }
-  .tier li{ margin:10px 0; }
-  .tier .btn{ display:inline-block; background: var(--accent); color: var(--accent-ink); border:1px solid #1dd86a; padding:14px 16px; border-radius:12px; font: 800 clamp(14px, 1.6vw, 16px)/1 Inter; text-decoration:none; }
-
-  /* ===== PORTFOLIO HERO BULLET SPACING ===== */
-  .mk-hero .mk-bullets{ margin-top: 56px; }
-  .mk-hero .mk-ctaRow{ margin-top: 60px; }
-
-  /* ===== PORTFOLIO HERO POSITIONING ===== */
-  .mk-hero{ padding-top: 80px; padding-bottom: 12px; }
-
-  .mk-logoReelWrap{ margin-top: -50px; }
-
-  .mk-wrap .mk-section{
-    margin-top: calc(var(--block-gap) * 1.1);
-    margin-bottom: calc(var(--block-gap) * 1.1);
-  }
-  .mk-wrap .mk-section:first-of-type{ margin-top: calc(var(--block-gap) * 1.1); }
-
-  .faq{ display:grid; gap:10px; margin-top:16px; text-align:left; }
-  .faq .q{ background:#000; border:1px solid var(--mk-stroke); border-radius: 12px; padding:14px; }
-  .faq .q h4{ margin:0 0 6px; font: 700 15px/1.3 Inter }
-  .faq .q p{ margin:0; color: var(--muted); font: 500 14px/1.65 Inter }
-
-  .mk-ctaFoot{ width:var(--grid); margin: var(--block-gap) auto; padding: 16px; border:1px solid var(--mk-stroke); border-radius: 16px; background:#000; display:grid; place-items:center; text-align:center; gap:10px; }
-
-  #pricing .mk-pricing,
-  #faq .faq{
-    max-width: var(--grid);
-    margin-left:auto;
-    margin-right:auto;
-  }
-
-  /* ===== NEW OVERVIEW SECTION STYLES ===== */
-  .mk-steps {
-    display: grid;
-    gap: 26px;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    margin-top: 26px;
-    max-width: 1080px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align:left;
-  }
-
-  .mk-step {
-    background: #000;
-    border: 1px solid var(--mk-stroke);
-    border-radius: 16px;
-    padding: 18px 20px 22px;
-    box-shadow: 0 12px 36px rgba(0,0,0,.55);
-  }
-
-  .mk-stepLabel {
-    font: 900 32px/1 "Space Grotesk", Inter;
-    color: var(--accent);
-    text-shadow: 0 0 14px rgba(29,222,106,.45);
-    margin-bottom: 6px;
-  }
-
-  .mk-stepTitle {
-    margin: 0;
-    font: 800 20px/1.3 Inter;
-    color: var(--text);
-  }
-
-  .mk-stepBody {
-    margin: 8px 0 0;
-    font: 500 15px/1.65 Inter;
-    color: var(--muted);
-  }
-
-  /* ===== BRAND CAROUSEL SECTION ===== */
-  .mk-brandsSection{ margin-top: var(--block-gap); }
   .mk-brandsRow{
     display:flex;
     flex-wrap:wrap;
@@ -1297,9 +1507,7 @@ function CRTLayout({
   }
   .mk-brandCard--active{
     border-color:#1dd86a;
-    box-shadow:
-      0 0 18px rgba(29,222,106,.8),
-      0 26px 70px rgba(0,0,0,.9);
+    box-shadow: 0 0 18px rgba(29,222,106,.8), 0 26px 70px rgba(0,0,0,.9);
     transform: translateY(-4px);
   }
   .mk-brandLogoFrame{
@@ -1312,23 +1520,10 @@ function CRTLayout({
     align-items:center;
     justify-content:center;
   }
-  .mk-brandLogoFrame img{
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-    display:block;
-  }
-  .mk-brandName{
-    font:700 16px/1.3 Inter;
-    color:var(--text);
-  }
+  .mk-brandLogoFrame img{ max-width:100%; max-height:100%; object-fit:contain; display:block; }
+  .mk-brandName{ font:700 16px/1.3 Inter; color:var(--text); }
 
-  .mk-brandDetailShell{
-    margin-top:18px;
-    max-width:var(--grid);
-    margin-left:auto;
-    margin-right:auto;
-  }
+  .mk-brandDetailShell{ margin-top:18px; max-width:var(--grid); margin-left:auto; margin-right:auto; }
   .mk-brandDetail{
     overflow:hidden;
     border-radius:16px;
@@ -1338,39 +1533,14 @@ function CRTLayout({
     max-height:0;
     opacity:0;
     transform: translateY(-6px);
-    transition:
-      max-height .45s cubic-bezier(.23,.82,.25,1),
-      opacity .35s ease-out,
-      transform .35s ease-out;
+    transition: max-height .45s cubic-bezier(.23,.82,.25,1), opacity .35s ease-out, transform .35s ease-out;
   }
-  .mk-brandDetail--open{
-    max-height:900px;
-    opacity:1;
-    transform: translateY(0);
-  }
-  .mk-brandDetailInner{
-    padding:20px 20px 22px;
-    display:grid;
-    gap:16px;
-  }
-  .mk-brandDetailTitle{
-    font:800 18px/1.3 Inter;
-    margin:0;
-    text-align:left;
-  }
-  .mk-brandDetailIntro{
-    margin:4px 0 10px;
-    font:500 14px/1.7 Inter;
-    color:var(--muted);
-    text-align:left;
-    max-width:640px;
-  }
-  .mk-brandMediaRow{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    justify-content:flex-start;
-  }
+  .mk-brandDetail--open{ max-height:900px; opacity:1; transform: translateY(0); }
+  .mk-brandDetailInner{ padding:20px 20px 22px; display:grid; gap:16px; }
+  .mk-brandDetailTitle{ font:800 18px/1.3 Inter; margin:0; text-align:left; }
+  .mk-brandDetailIntro{ margin:4px 0 10px; font:500 14px/1.7 Inter; color:var(--muted); text-align:left; max-width:640px; }
+
+  .mk-brandMediaRow{ display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-start; }
   .mk-brandMedia{
     flex:1 1 clamp(220px, 26%, 320px);
     border-radius:12px;
@@ -1383,76 +1553,23 @@ function CRTLayout({
     justify-content:center;
   }
   .mk-brandMedia img,
-  .mk-brandMedia video{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
+  .mk-brandMedia video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .mk-brandMedia--clickable{ cursor:pointer; }
 
-  /* ===== COMIC HEADLINE FINAL (override + animation) ===== */
-  @keyframes comicWobble{
-    0%,100% { transform: rotate(-1.2deg) translateY(0); }
-    50%     { transform: rotate( 1.2deg) translateY(2px); }
-  }
-
-  .comicHead{
-    display:inline-block;
-    font-family: "VT323", ui-monospace, monospace;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-
-    padding: .35em .55em .3em;
-    background: #ffd84d;
-    color: #111;
-
-    border-radius: 12px;
-    border: 3px solid #050505;
-
-    box-shadow:
-      0 4px 0 #050505,
-      0 10px 26px rgba(0,0,0,.45);
-
-    animation: comicWobble 2.2s ease-in-out infinite;
-    transform-origin: center;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .comicHead{ animation: none; }
-  }
-
-  /* ===== PORTFOLIO PURPLE MODE ===== */
-  .mk-wrap[data-page="portfolio"]{
-    --accent: #7f4ced;
-    --ring: rgba(117, 67, 223, 0.7);
-    --g1: #783de7;
-    --g2: #5d39df;
-  }
-  .mk-wrap[data-page="portfolio"]{
-    --accent: #eed113;
-    --ring: rgba(109,60,255,.65);
-    --g1: #8a63ff;
-    --g2: #4f2bcf;
-  }
-
+  /* Portfolio color mode tweaks */
   .mk-wrap[data-page="portfolio"]{ --outline-yellow: #ffd84d; }
-
   .mk-wrap[data-page="portfolio"] .ctrlBtn,
   .mk-wrap[data-page="portfolio"] .mk-home,
   .mk-wrap[data-page="portfolio"] .sm-pill,
   .mk-wrap[data-page="portfolio"] .mk-btn{
     border-color: var(--outline-yellow);
   }
-
   .mk-wrap[data-page="portfolio"] .lamp,
   .mk-wrap[data-page="portfolio"] .dot,
   .mk-wrap[data-page="portfolio"] .sm-pillDot{
     background: var(--outline-yellow);
-    box-shadow:
-      0 0 10px rgba(255,216,77,.75),
-      0 0 22px rgba(255,216,77,.45);
+    box-shadow: 0 0 10px rgba(255,216,77,.75), 0 0 22px rgba(255,216,77,.45);
   }
-
-  .mk-wrap{ transition: filter .25s ease; }
   `;
 
   return (
@@ -1460,7 +1577,6 @@ function CRTLayout({
       <style>{css}</style>
       <div className="room">
         <div className="rig">
-          {/* ===== Monitor ===== */}
           <div className="monitor">
             <div className="bezel">
               <span className="screw tl" />
@@ -1492,7 +1608,6 @@ function CRTLayout({
                   </div>
                 ) : (
                   <>
-                    {/* Side buttons */}
                     <nav
                       className="sideDock left"
                       aria-label="Left monitor buttons"
@@ -1510,6 +1625,7 @@ function CRTLayout({
                         </button>
                       ))}
                     </nav>
+
                     <nav
                       className="sideDock right"
                       aria-label="Right monitor buttons"
@@ -1529,11 +1645,16 @@ function CRTLayout({
                     </nav>
 
                     <div className="scan" />
+
                     {mode === "center" ? (
                       <div className="screen-center">{children}</div>
                     ) : (
-                      <div className="screen-scroll">{children}</div>
+                      <div ref={scrollRef} className="screen-scroll">
+                        {children}
+                      </div>
                     )}
+
+                    <ChannelKnob powered={powered} docked={knobDocked} />
                   </>
                 )}
               </div>
@@ -1557,11 +1678,28 @@ function HomeContent() {
   const [fadeWelcome, setFadeWelcome] = useState(false);
   const welcomeText = "Welcome to The Gx Universe";
   const aboutRef = useRef(null);
+
   const heroVideoRef = useRef(null);
   const [muted, setMuted] = useState(true);
   const [vol, setVol] = useState(0.6);
 
-  // carousel state
+  // Lightbox state (HOME)
+  const [lbOpen, setLbOpen] = useState(false);
+  const [lbSrc, setLbSrc] = useState("");
+  const [lbAlt, setLbAlt] = useState("");
+
+  const openLightbox = useCallback((src, alt) => {
+    setLbSrc(src);
+    setLbAlt(alt || "Preview");
+    setLbOpen(true);
+  }, []);
+
+  const closeLightbox = useCallback(() => {
+    setLbOpen(false);
+    setLbSrc("");
+    setLbAlt("");
+  }, []);
+
   const photoSlides = [
     {
       src: asset("poster 1.jpg"),
@@ -1602,19 +1740,18 @@ function HomeContent() {
   ];
 
   const [slide, setSlide] = useState(0);
-
   const nextSlide = () => setSlide((s) => (s + 1) % photoSlides.length);
   const prevSlide = () =>
     setSlide((s) => (s - 1 + photoSlides.length) % photoSlides.length);
   const goToSlide = (i) => setSlide(i);
 
-  // typed welcome
   useEffect(() => {
     setTyped("");
     setFadeWelcome(false);
     let i = 0;
     const TYPING_MS = 90;
     const FADE_DELAY = 900;
+
     const tick = () => {
       i += 1;
       setTyped(welcomeText.slice(0, i));
@@ -1624,6 +1761,7 @@ function HomeContent() {
         setTimeout(() => setFadeWelcome(true), FADE_DELAY);
       }
     };
+
     const id = setTimeout(tick, 220);
     return () => clearTimeout(id);
   }, []);
@@ -1633,6 +1771,7 @@ function HomeContent() {
       aboutRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
   const keyScroll = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -1654,6 +1793,7 @@ function HomeContent() {
       }
     }
   };
+
   const handleVol = async (e) => {
     const v = heroVideoRef.current;
     if (!v) return;
@@ -1677,7 +1817,6 @@ function HomeContent() {
   return (
     <>
       <div className="h_wrap">
-        {/* ===== HERO ===== */}
         <section className="h_hero">
           <video
             ref={heroVideoRef}
@@ -1693,7 +1832,6 @@ function HomeContent() {
             <source src={HOME_HERO_VIDEO} type="video/mp4" />
           </video>
 
-          {/* Scroll signs */}
           <div
             className="h_scroll left"
             onClick={scrollToAbout}
@@ -1709,6 +1847,7 @@ function HomeContent() {
             <div className="h_arrow a2" />
             <div className="h_arrow a3" />
           </div>
+
           <div
             className="h_scroll right"
             onClick={scrollToAbout}
@@ -1735,7 +1874,6 @@ function HomeContent() {
             </div>
           </div>
 
-          {/* Audio controls */}
           <div className="h_audioWrap">
             <button
               className="h_audioBtn"
@@ -1760,47 +1898,24 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ===== CONTENT BELOW HERO ===== */}
         <div ref={aboutRef} className="h_outer">
-          {/* Tagline with ARCADE container + glow cycle */}
-          <section className="arcade-card" aria-label="Studio one-liner">
-            <div
-              className="inner h_block"
-              style={{ border: "none", background: "transparent" }}
-            >
-              <h2 className="h_titleXL glow-cycle">
-                The One-Stop Creative Studio
-              </h2>
-              <div className="h_titleSub">
-                Marketing, Music, Animation and Social Campaigns
-              </div>
-            </div>
-          </section>
-
-          {/* Note + Carousel */}
           <section
             className="h_block h_block--ink"
             aria-label="Scenes from the Gx Universe"
-            style={{ marginTop: 14 }}
           >
-            {/* Center note ABOVE carousel */}
             <div className="h_centerNote">
               <strong>Scenes from the Gx Universe</strong>
               <p>
                 I started in tiny rooms: a green studio where we stitched worlds
                 together, a recording booth where we chased the perfect take,
                 and late nights rigging lights with a cameraman to make
-                something <em>feel</em> alive. Those sessions taught me how
-                attention really works — and how to turn it into revenue.
+                something <em>feel</em> alive.
                 <br />
                 <br />
-                <strong>
-                  Scroll through a few checkpoints from the journey so far.
-                </strong>
+                <strong>Click a scene to view it larger.</strong>
               </p>
             </div>
 
-            {/* Carousel with side previews */}
             <div className="h_carouselWrap">
               <div className="h_carousel">
                 <button
@@ -1812,19 +1927,23 @@ function HomeContent() {
                   ◀
                 </button>
 
-                {/* Previous preview */}
                 <div className="h_carFrame h_carFrame--side" aria-hidden="true">
                   <figure className="h_imgCard h_imgCard--carousel h_imgCard--side">
                     <img src={photoSlides[prevIndex].src} alt="" />
                   </figure>
                 </div>
 
-                {/* Main slide */}
                 <div className="h_carFrame h_carFrame--center">
-                  <figure className="h_imgCard h_imgCard--carousel">
+                  <figure className="h_imgCard h_imgCard--carousel h_imgClickable">
                     <img
                       src={photoSlides[slide].src}
                       alt={photoSlides[slide].alt}
+                      onClick={() =>
+                        openLightbox(
+                          photoSlides[slide].src,
+                          photoSlides[slide].alt,
+                        )
+                      }
                     />
                     <figcaption className="h_carCaption">
                       <span>{photoSlides[slide].tag}</span>
@@ -1833,7 +1952,6 @@ function HomeContent() {
                   </figure>
                 </div>
 
-                {/* Next preview */}
                 <div className="h_carFrame h_carFrame--side" aria-hidden="true">
                   <figure className="h_imgCard h_imgCard--carousel h_imgCard--side">
                     <img src={photoSlides[nextIndex].src} alt="" />
@@ -1863,49 +1981,23 @@ function HomeContent() {
               </div>
             </div>
           </section>
-
-          {/* Center note BELOW carousel */}
-          <div className="h_centerNote" style={{ marginTop: 16 }}>
-            <strong>From content to conversion.</strong>
-            <p>
-              From creating art to branding as an artist: landing pages that
-              load fast, Google Ads that scale, and social media branding that
-              keeps people coming back. I produce campaigns end-to-end — the
-              trailer, the page, the ads, the automation — so the creative{" "}
-              <em>and</em> the numbers line up. This is where the ideas get
-              stress-tested before they become campaigns, records, or full-blown
-              worlds.
-            </p>
-          </div>
-
-          {/* GX Universe with ARCADE container + glow cycle */}
-          <section
-            className="arcade-card"
-            aria-label="GX Universe headline"
-            style={{ marginTop: 14 }}
-          >
-            <div
-              className="inner h_block"
-              style={{
-                border: "none",
-                background: "transparent",
-                textAlign: "center",
-              }}
-            >
-              <h2 className="h_titleMain glow-cycle">The Gx Universe</h2>
-              <div className="h_titleTag glow-cycle-sub">
-                Where Ideas Become Reality.
-              </div>
-            </div>
-          </section>
         </div>
       </div>
+
+      <ImageLightbox
+        open={lbOpen}
+        src={lbSrc}
+        alt={lbAlt}
+        onClose={closeLightbox}
+      />
     </>
   );
 }
 
 /* =========================
    SOCIAL MEDIA (PAGE)
+   - tiles open lightbox on-site
+   - lightbox includes "Open on Instagram"
    ========================= */
 function SocialMediaContent() {
   useEffect(() => {
@@ -1967,146 +2059,161 @@ function SocialMediaContent() {
     el.scrollBy({ left: dir * (cardW + 12) * 2, behavior: "smooth" });
   };
 
+  // Lightbox state (SOCIAL)
+  const [lbOpen, setLbOpen] = useState(false);
+  const [lbSrc, setLbSrc] = useState("");
+  const [lbAlt, setLbAlt] = useState("");
+  const [lbUrl, setLbUrl] = useState("");
+
+  const openTile = (p) => {
+    setLbSrc(asset(p.thumb));
+    setLbAlt(p.tag);
+    setLbUrl(p.url);
+    setLbOpen(true);
+  };
+
+  const closeTile = () => {
+    setLbOpen(false);
+    setLbSrc("");
+    setLbAlt("");
+    setLbUrl("");
+  };
+
   const IG_PROFILE_URL = "https://www.instagram.com/thegxuniverse/";
   const X_PROFILE_URL = "https://x.com/thegxuniverse";
 
   return (
-    <div className="sm-wrap">
-      <section className="sm-hero">
-        <div className="sm-hero-inner">
-          <h1 className="sm-h1">Social Media</h1>
-          <p className="sm-sub">
-            Social Media is the distribution layer — supporting launches,
-            extending campaigns, and feeding real-world feedback back into
-            creative decisions. It’s where we test hooks, find new audiences,
-            and keep momentum going after the drop.
-          </p>
-        </div>
-      </section>
-
-      <section className="sm-section" aria-label="Instagram carousel">
-        <div className="sm-carouselShell">
-          <div className="sm-carouselTop">
-            <h2 className="sm-carouselTitle">Instagram Carousel</h2>
-            <p className="sm-carouselHint">
-              Tap a tile to open it on Instagram.
+    <>
+      <div className="sm-wrap">
+        <section className="sm-hero">
+          <div className="sm-hero-inner">
+            <h1 className="sm-h1">Social Media</h1>
+            <p className="sm-sub">
+              Social Media is the distribution layer — supporting launches,
+              extending campaigns, and feeding real-world feedback back into
+              creative decisions. It’s where we test hooks, find new audiences,
+              and keep momentum going after the drop.
             </p>
           </div>
+        </section>
 
-          <div className="sm-carousel">
-            <div ref={rowRef} className="sm-carouselRow" role="list">
-              {IG_POSTS.map((p, idx) => (
-                <a
-                  key={idx}
-                  className="sm-tile"
-                  href={p.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  role="listitem"
-                  aria-label={`Open Instagram post ${idx + 1}`}
-                  title="Open on Instagram"
-                >
-                  <img src={asset(p.thumb)} alt={p.tag} loading="lazy" />
-                  <div className="sm-tileOverlay">
-                    <div className="sm-tileTag">{p.tag}</div>
-                    <p className="sm-tileCap">{p.caption}</p>
+        <section className="sm-section" aria-label="Instagram carousel">
+          <div className="sm-carouselShell">
+            <div className="sm-carouselTop">
+              <h2 className="sm-carouselTitle">Instagram Carousel</h2>
+              <p className="sm-carouselHint">Tap a tile to view it larger.</p>
+            </div>
+
+            <div className="sm-carousel">
+              <div ref={rowRef} className="sm-carouselRow" role="list">
+                {IG_POSTS.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="sm-tile"
+                    role="listitem"
+                    tabIndex={0}
+                    onClick={() => openTile(p)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" || e.key === " " ? openTile(p) : null
+                    }
+                    aria-label={`Open preview ${idx + 1}`}
+                    title="Click to preview"
+                  >
+                    <img src={asset(p.thumb)} alt={p.tag} loading="lazy" />
+                    <div className="sm-tileOverlay">
+                      <div className="sm-tileTag">{p.tag}</div>
+                      <p className="sm-tileCap">{p.caption}</p>
+                    </div>
                   </div>
-                </a>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            <div className="sm-actions">
+              <button className="sm-btn" onClick={() => scrollByCards(-1)}>
+                ◀ Prev
+              </button>
+              <button
+                className="sm-btn sm-btnPrimary"
+                onClick={() => scrollByCards(1)}
+              >
+                Next ▶
+              </button>
             </div>
           </div>
+        </section>
 
-          <div className="sm-actions">
-            <button className="sm-btn" onClick={() => scrollByCards(-1)}>
-              ◀ Prev
-            </button>
-            <button
-              className="sm-btn sm-btnPrimary"
-              onClick={() => scrollByCards(1)}
-            >
-              Next ▶
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="sm-section" aria-label="What social does">
-        <div style={{ textAlign: "center" }}>
-          <h2 className="mk-h2" style={{ marginBottom: 6 }}>
-            How It Fits Into The Pipeline
-          </h2>
-          <p
-            style={{
-              margin: "6px auto 0",
-              maxWidth: "720px",
-              color: "var(--muted)",
-              font: "500 15px/1.7 Inter",
-              textAlign: "center",
-            }}
+        <div className="sm-footer" aria-label="Social links">
+          <a
+            className="sm-pill"
+            href={IG_PROFILE_URL}
+            target="_blank"
+            rel="noreferrer"
           >
-            Social Media supports launches, activates interactive experiences,
-            and keeps the brand’s visual language consistent across every post.
-          </p>
+            <span className="sm-pillDot" aria-hidden="true" />
+            Instagram
+          </a>
+
+          <a
+            className="sm-pill"
+            href={X_PROFILE_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="sm-pillDot" aria-hidden="true" />
+            Twitter / X
+          </a>
         </div>
 
-        <div className="sm-cards">
-          <div className="sm-card">
-            <div className="sm-cardKicker">01</div>
-            <h3 className="sm-cardTitle">Support Launches</h3>
-            <p className="sm-cardBody">
-              Pre launch planning including clear goals and deadlines to meet
-              with content that extends the campaign lifespan and keep momentum
-              moving after the drop.
+        {/* ===== CONTACT (NEW) ===== */}
+        <section className="sm-contact" aria-label="Contact">
+          <div className="sm-contactCard">
+            <h2 className="sm-contactTitle">Contact</h2>
+            <p className="sm-contactSub">
+              Want to collaborate, hire me, or get a quick walkthrough of the
+              work? Hit me up — or grab my resume.
             </p>
-          </div>
 
-          <div className="sm-card">
-            <div className="sm-cardKicker">02</div>
-            <h3 className="sm-cardTitle">Interactive Filters / AR</h3>
-            <p className="sm-cardBody">
-              Filters, AR, and other interactive experiences turn launches into
-              memorable moments. We specialize in turning attention into
-              participation — boosting shares, saves, and community engagement.
-            </p>
-          </div>
+            <div className="sm-contactActions">
+              <a
+                className="sm-contactBtn sm-contactBtnPrimary"
+                href={asset("ManinDGauba_Resume.pdf")}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Download resume"
+                title="Download Resume"
+              >
+                Download Resume
+              </a>
 
-          <div className="sm-card">
-            <div className="sm-cardKicker">03</div>
-            <h3 className="sm-cardTitle">Brand Identity Alignment</h3>
-            <p className="sm-cardBody">
-              A consistent system for typography, color, pacing, and voice — so
-              every post feels like it belongs in the same universe.
-            </p>
+              <a
+                className="sm-contactBtn"
+                href="mailto:ManinDGauba@gmail.com"
+                aria-label="Email Manin"
+                title="Email"
+              >
+                Email Me
+              </a>
+            </div>
           </div>
-        </div>
-      </section>
-
-      <div className="sm-footer" aria-label="Social links">
-        <a
-          className="sm-pill"
-          href={IG_PROFILE_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <span className="sm-pillDot" aria-hidden="true" />
-          Instagram
-        </a>
-        <a
-          className="sm-pill"
-          href={X_PROFILE_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <span className="sm-pillDot" aria-hidden="true" />
-          Twitter / X
-        </a>
+        </section>
       </div>
-    </div>
+
+      <ImageLightbox
+        open={lbOpen}
+        src={lbSrc}
+        alt={lbAlt}
+        onClose={closeTile}
+        actionUrl={lbUrl}
+        actionLabel="OPEN ON IG"
+      />
+    </>
   );
 }
 
 /* =========================
-   MARKETING (PORTFOLIO COPY)
+   MARKETING (PORTFOLIO)
+   - brand media images open lightbox
    ========================= */
 function MarketingContent() {
   useEffect(() => {
@@ -2175,7 +2282,7 @@ function MarketingContent() {
       blurb:
         "Contributed to lookbooks and e-commerce imagery—helping maintain organized styling flow, consistent presentation, and clean handoff to post-production.",
       projects: [
-        { type: "image", src: asset("champs 1.jpg"), alt: "Champions Kids" },
+        { type: "image", src: asset("champs 1.jpg"), alt: "Champion Kids" },
         { type: "image", src: asset("champs 2.jpg"), alt: "Champion Kids" },
         { type: "image", src: asset("champs 3.jpg"), alt: "Champion Kids" },
       ],
@@ -2219,49 +2326,25 @@ function MarketingContent() {
   const [activeBrand, setActiveBrand] = useState(
     brands.length ? brands[0].id : null,
   );
-
-  const tiers = [
-    {
-      name: "Creative Production",
-      price: "E-commerce + Campaigns",
-      cadence: "What I do",
-      features: [
-        "On-set support + styling workflow coordination",
-        "Visual consistency across PDPs, grids, and lifestyle",
-        "Asset prep, QA, and clean handoff to post",
-        "Fast turnaround mindset in high-volume environments",
-      ],
-      cta: "Contact",
-    },
-    {
-      name: "Project Coordination",
-      price: "Cross-Team Execution",
-      cadence: "How I work",
-      features: [
-        "Keeps product moving from prep → set → post",
-        "Clear communication across studio, styling, and creative",
-        "Organized file structures, naming, and delivery readiness",
-        "Deadline-focused with calm, reliable follow-through",
-      ],
-      cta: "Email Me",
-    },
-    {
-      name: "Performance Mindset",
-      price: "Speed + Quality",
-      cadence: "What I optimize",
-      features: [
-        "Builds repeatable workflows that reduce rework",
-        "Balances brand guidelines with practical constraints",
-        "Improves consistency across drops and seasonal updates",
-        "Outcome-driven: ship clean work, learn, iterate",
-      ],
-      cta: "Download Resume",
-    },
-  ];
-
   const toggleBrand = (id) =>
     setActiveBrand((prev) => (prev === id ? null : id));
   const currentBrand = brands.find((b) => b.id === activeBrand) || null;
+
+  // Lightbox state (MARKETING)
+  const [lbOpen, setLbOpen] = useState(false);
+  const [lbSrc, setLbSrc] = useState("");
+  const [lbAlt, setLbAlt] = useState("");
+
+  const openLightbox = (src, alt) => {
+    setLbSrc(src);
+    setLbAlt(alt || "Preview");
+    setLbOpen(true);
+  };
+  const closeLightbox = () => {
+    setLbOpen(false);
+    setLbSrc("");
+    setLbAlt("");
+  };
 
   return (
     <>
@@ -2275,14 +2358,8 @@ function MarketingContent() {
             <a className="mk-link" href="#brands">
               Experience
             </a>
-            <a className="mk-link" href="#overview">
-              How I Work
-            </a>
             <a className="mk-link" href="#pricing">
               Core Strengths
-            </a>
-            <a className="mk-link" href="#faq">
-              FAQ
             </a>
             <a className="mk-cta" href="mailto:ManinDGauba@gmail.com">
               Contact
@@ -2290,7 +2367,6 @@ function MarketingContent() {
           </div>
         </div>
 
-        {/* HERO */}
         <section className="mk-hero">
           <div className="mk-hero-inner">
             <h1 className="mk-h1 comicHead">
@@ -2307,7 +2383,7 @@ function MarketingContent() {
                 "Performance Mindset (speed, quality, consistency)",
               ].map((b) => (
                 <li key={b}>
-                  <span className="dot" aria-hidden="true"></span>
+                  <span className="dot" aria-hidden="true" />
                   <span>{b}</span>
                 </li>
               ))}
@@ -2329,8 +2405,7 @@ function MarketingContent() {
           </div>
         </section>
 
-        {/* BRAND CAROUSEL SECTION */}
-        <section id="brands" className="mk-section mk-brandsSection">
+        <section id="brands" className="mk-section">
           <div className="mk-logoReelWrap">
             <div className="mk-logoReelFrame">
               <video
@@ -2340,17 +2415,14 @@ function MarketingContent() {
                 muted
                 playsInline
               />
-
               <div className="mk-logoOverlay">
                 <div className="mk-logoOverlayInner">
                   <h2 className="mk-logoOverlayH2">
                     Selected Brand Experience
                   </h2>
                   <p className="mk-logoOverlayP">
-                    A snapshot of teams and product categories I’ve supported
-                    across e-commerce and brand creative. Tap a logo to see
-                    sample visuals and the kind of work I contributed to
-                    (workflow, coordination, and content output).
+                    Tap a logo to see sample visuals. Click any image to view it
+                    larger on the page.
                   </p>
                 </div>
               </div>
@@ -2383,9 +2455,27 @@ function MarketingContent() {
                     <h3 className="mk-brandDetailTitle">{currentBrand.name}</h3>
                     <p className="mk-brandDetailIntro">{currentBrand.blurb}</p>
                   </div>
+
                   <div className="mk-brandMediaRow">
                     {currentBrand.projects.map((p, idx) => (
-                      <div key={idx} className="mk-brandMedia">
+                      <div
+                        key={idx}
+                        className={`mk-brandMedia ${p.type === "image" ? "mk-brandMedia--clickable" : ""}`}
+                        onClick={() =>
+                          p.type === "image" ? openLightbox(p.src, p.alt) : null
+                        }
+                        role={p.type === "image" ? "button" : undefined}
+                        tabIndex={p.type === "image" ? 0 : undefined}
+                        onKeyDown={(e) =>
+                          p.type === "image" &&
+                          (e.key === "Enter" || e.key === " ")
+                            ? openLightbox(p.src, p.alt)
+                            : null
+                        }
+                        aria-label={
+                          p.type === "image" ? `Open ${p.alt}` : undefined
+                        }
+                      >
                         {p.type === "video" ? (
                           <video src={p.src} autoPlay loop muted playsInline />
                         ) : (
@@ -2400,145 +2490,35 @@ function MarketingContent() {
           </div>
         </section>
 
-        {/* OVERVIEW SECTION */}
-        <section id="overview" className="mk-section">
-          <h2 className="mk-h2 comicHead">How I Work</h2>
+        <section id="pricing" className="mk-section">
+          <h2 className="mk-h2">Core Strengths</h2>
           <p
             style={{
-              margin: "6px 0 18px",
+              margin: "6px auto 0",
               maxWidth: "720px",
-              marginInline: "auto",
               color: "var(--muted)",
               font: "500 15px/1.7 Inter",
             }}
           >
-            I’m a process-minded, goal oriented creative: I help teams move
-            faster without losing quality. My focus is keeping product flowing
-            smoothly from prep → launch → post, with clear communication and
-            reliable deliverables.
+            Fast, organized execution — with clean handoffs and consistent
+            visual output.
           </p>
-
-          <div className="mk-steps">
-            <div className="mk-step">
-              <div className="mk-stepLabel">01</div>
-              <h3 className="mk-stepTitle">Goal-Driven Execution</h3>
-              <p className="mk-stepBody">
-                Clarify deliverables and timelines while maintaining clear
-                communication across marketing, merchandising, creative teams,
-                and vendors.
-              </p>
-            </div>
-
-            <div className="mk-step">
-              <div className="mk-stepLabel">02</div>
-              <h3 className="mk-stepTitle">Launch-Ready Execution</h3>
-              <p className="mk-stepBody">
-                Coordinate product and assets, support on-set needs, and keep
-                shoots on schedule for timely launches.
-              </p>
-            </div>
-
-            <div className="mk-step">
-              <div className="mk-stepLabel">03</div>
-              <h3 className="mk-stepTitle">Post-Launch Delivery</h3>
-              <p className="mk-stepBody">
-                Ensure final assets are clean, organized, and usable across
-                platforms once campaigns go live.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* PRICING (CORE STRENGTHS) */}
-        <section id="pricing" className="mk-section">
-          <h2 className="mk-h2 comicHead">Core Strengths</h2>
-          <div className="mk-pricing">
-            {tiers.map((t) => (
-              <div key={t.name} className="tier">
-                <h3>{t.name}</h3>
-                <div className="price">{t.price}</div>
-                <div className="tiny">{t.cadence}</div>
-                <ul>
-                  {t.features.map((f) => (
-                    <li key={f}>{f}</li>
-                  ))}
-                </ul>
-
-                {t.cta === "Download Resume" ? (
-                  <a
-                    className="btn"
-                    href={asset("ManinDGauba_Resume.pdf")}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {t.cta}
-                  </a>
-                ) : (
-                  <a className="btn" href="mailto:ManinDGauba@gmail.com">
-                    {t.cta}
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section id="faq" className="mk-section">
-          <h2 className="mk-h2">FAQs</h2>
-          <div className="faq">
-            <div className="q">
-              <h4>What roles are you targeting?</h4>
-              <p>
-                Creative Operations, E-commerce Production/Coordinator roles,
-                Asset Management, and adjacent marketing/production roles.
-              </p>
-            </div>
-            <div className="q">
-              <h4>What environments do you thrive in?</h4>
-              <p>
-                High-volume, fast-moving teams with clear deadlines—where
-                organization, communication, and quality control matter.
-              </p>
-            </div>
-            <div className="q">
-              <h4>What tools do you work with?</h4>
-              <p>
-                Adobe (Photoshop), content pipelines, and web tooling (React).
-                Comfortable learning new DAM/PM systems quickly.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA FOOTER */}
-        <section className="mk-ctaFoot">
-          <h3
-            style={{ margin: 0, font: "800 24px/1.2 'Space Grotesk', Inter" }}
-          >
-            Want a quick walkthrough?
-          </h3>
-          <p
-            style={{
-              margin: "6px 0 10px",
-              color: "#a6b0c0",
-              font: "500 15px/1.6 Inter",
-            }}
-          >
-            I can share context on the workflows, responsibilities, and outcomes
-            behind these examples—happy to connect.
-          </p>
-          <a className="mk-btn" href="mailto:ManinDGauba@gmail.com">
-            Contact
-          </a>
         </section>
       </div>
+
+      <ImageLightbox
+        open={lbOpen}
+        src={lbSrc}
+        alt={lbAlt}
+        onClose={closeLightbox}
+      />
     </>
   );
 }
 
 /* =========================
    Gallery (PAGE)
+   - your existing gallery lightbox kept as-is
    ========================= */
 function GalleryContent() {
   useEffect(() => {
@@ -2546,14 +2526,6 @@ function GalleryContent() {
   }, []);
 
   const MEDIA = [
-    {
-      id: "home-boot_1",
-      type: "video",
-      src: HOME_LOGO_VIDEO,
-      tag: "BOOT",
-      title: "Home Boot Logo",
-      span: "cg-span-6",
-    },
     {
       id: "home-hero",
       type: "video",
@@ -2784,87 +2756,6 @@ function GalleryContent() {
       title: "LE Shoot 2",
       span: "cg-span-4",
     },
-
-    {
-      id: "ig-01",
-      type: "image",
-      src: asset("social/ig-01.jpg"),
-      tag: "SOCIAL",
-      title: "IG 01",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-02",
-      type: "image",
-      src: asset("social/ig-02.jpg"),
-      tag: "SOCIAL",
-      title: "IG 02",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-03",
-      type: "image",
-      src: asset("social/ig-03.jpg"),
-      tag: "SOCIAL",
-      title: "IG 03",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-04",
-      type: "image",
-      src: asset("social/ig-04.jpg"),
-      tag: "SOCIAL",
-      title: "IG 04",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-05",
-      type: "image",
-      src: asset("social/ig-05.jpg"),
-      tag: "SOCIAL",
-      title: "IG 05",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-06",
-      type: "image",
-      src: asset("social/ig-06.jpg"),
-      tag: "SOCIAL",
-      title: "IG 06",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-07",
-      type: "image",
-      src: asset("social/ig-07.jpg"),
-      tag: "SOCIAL",
-      title: "IG 07",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-08",
-      type: "image",
-      src: asset("social/ig-08.jpg"),
-      tag: "SOCIAL",
-      title: "IG 08",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-09",
-      type: "image",
-      src: asset("social/ig-09.jpg"),
-      tag: "SOCIAL",
-      title: "IG 09",
-      span: "cg-span-3",
-    },
-    {
-      id: "ig-10",
-      type: "image",
-      src: asset("social/ig-10.jpg"),
-      tag: "SOCIAL",
-      title: "IG 10",
-      span: "cg-span-3",
-    },
   ];
 
   const FILTERS = [
@@ -2899,10 +2790,7 @@ function GalleryContent() {
         <div className="cg-hero-inner">
           <h1 className="cg-h1">Gallery</h1>
           <p className="cg-sub">
-            A single gallery of everything currently powering the site — hero
-            videos, logo reels, portfolio visuals, and photoshoots for major
-            kids apparel brands — arranged in a clean, paneled layout. Click
-            anything to view it larger.
+            Click anything to view it larger. (Videos open with controls.)
           </p>
         </div>
       </section>
@@ -3020,6 +2908,7 @@ function HomePageBoot() {
     </CRTLayout>
   );
 }
+
 function HomePageWarm() {
   return (
     <CRTLayout mode="scroll">
@@ -3027,6 +2916,7 @@ function HomePageWarm() {
     </CRTLayout>
   );
 }
+
 function MarketingPage() {
   return (
     <CRTLayout mode="scroll">
@@ -3042,6 +2932,7 @@ function SocialMediaPage() {
     </CRTLayout>
   );
 }
+
 function GalleryPage() {
   return (
     <CRTLayout mode="scroll">
@@ -3050,9 +2941,9 @@ function GalleryPage() {
   );
 }
 
-/* ===============
+/* =========================
    APP
-   =============== */
+   ========================= */
 export default function App() {
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL || ""}>
