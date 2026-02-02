@@ -1110,6 +1110,125 @@ function CRTLayout({
   .mk-hero-inner{ width:var(--grid); display:grid; gap:14px; text-align:center; margin-inline:auto; }
   .mk-h1{ font: 800 clamp(32px,5.8vw,60px)/1.1 "Space Grotesk", Inter; letter-spacing:-.02em; margin:0; background: linear-gradient(180deg, #ffffff, #d8e3d9); color: transparent; background-clip:text; }
   .comicHead{ display:inline-block; font-family: "VT323", ui-monospace, monospace; text-transform: uppercase; letter-spacing: .08em; padding: .35em .55em .3em; background: #ffd84d; color: #111; border-radius: 12px; border: 3px solid #050505; box-shadow: 0 4px 0 #050505, 0 10px 26px rgba(0,0,0,.45); }
+/* ===== CORE STRENGTHS GRID (3 TOP / 2 BOTTOM — FIXED) ===== */
+.mk-strengthsGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap:18px;
+  margin-top:24px;
+}
+
+/* Top row */
+/* ===== CORE STRENGTHS GRID (3 TOP / 2 BOTTOM — PERFECT SPLIT) ===== */
+.mk-strengthsGrid{
+  display:grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: auto auto;
+  gap:18px;
+  margin-top:24px;
+}
+
+/* Top row: 3 cards, each spans 2/6 */
+.mk-strengthsGrid .mk-strength:nth-child(1){ grid-column: 1 / span 2; grid-row: 1; }
+.mk-strengthsGrid .mk-strength:nth-child(2){ grid-column: 3 / span 2; grid-row: 1; }
+.mk-strengthsGrid .mk-strength:nth-child(3){ grid-column: 5 / span 2; grid-row: 1; }
+
+/* Bottom row: 2 cards, each spans half (3/6) */
+.mk-strengthsGrid .mk-strength:nth-child(4){ grid-column: 1 / span 3; grid-row: 2; }
+.mk-strengthsGrid .mk-strength:nth-child(5){ grid-column: 4 / span 3; grid-row: 2; }
+
+/* Card */
+.mk-strength{
+  background:#000;
+  border:1.5px solid var(--mk-stroke);
+  border-radius:16px;
+  padding:18px 18px 20px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.65);
+  text-align:left;
+
+  /* prevents text clipping in grids */
+  min-width:0;
+}
+
+/* Make sure long text never cuts off */
+.mk-strength{
+  background:#000;
+  border:1.5px solid var(--mk-stroke);
+  border-radius:16px;
+  padding:18px 18px 20px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.65);
+  text-align:center;   /* ✅ REQUIRED */
+}
+
+
+/* ===== Responsive ===== */
+@media (max-width: 980px){
+  .mk-strengthsGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+  .mk-strengthsGrid .mk-strength{
+    grid-column:auto !important;
+    grid-row:auto !important;
+  }
+}
+
+@media (max-width: 640px){
+  .mk-strengthsGrid{
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Yellow headline — CENTERED */
+.mk-strengthTitle{
+  display:inline-flex;              /* key */
+  justify-content:center;
+  align-items:center;
+
+  margin: 0 auto 10px auto;         /* key */
+  padding:6px 12px 5px;
+
+  font-family:"Space Grotesk", Inter;
+  font-weight:800;
+  font-size:14px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+
+  background:#ffd84d;
+  color:#000;
+  border-radius:10px;
+  border:3px solid #050505;
+  box-shadow:0 4px 0 #050505;
+}
+
+
+.mk-strengthBody{
+  margin:0;
+  font:500 14px/1.7 Inter;
+  color:var(--muted);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 980px){
+  .mk-strengthsGrid{
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .mk-strengthsGrid .mk-strength{
+    grid-column:auto !important;
+    grid-row:auto !important;
+  }
+}
+
+@media (max-width: 640px){
+  .mk-strengthsGrid{
+    grid-template-columns: 1fr;
+  }
+}
+
 
   .mk-bullets{ width:var(--grid); display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 18px; list-style:none; padding:0; margin: 12px auto 0; text-align:left; }
   .mk-bullets li{ display:flex; align-items:flex-start; gap:10px; font: 700 clamp(16px, 1.8vw, 18px)/1.5 Inter; color: var(--text); }
@@ -1634,6 +1753,34 @@ function HomeContent() {
           </section>
         </div>
       </div>
+      <section
+        className="h_block h_block--slate"
+        aria-label="About The Gx Universe"
+      >
+        <div className="h_centerNote">
+          <p>
+            The Gx Universe is a connected world of music, animation, and
+            interactive experiences — built like a universe you can actually
+            step into.
+            <br />
+            <br />
+            I don’t just produce marketable content. I build scalable worlds —
+            continous brand identity, consistent visuals, evolving narratives,
+            and assets that deploy fast across platforms.
+            <br />
+            <br />
+            If you’re building a brand, planning a product launch, or need
+            someone who can take an idea from concept → execution → rollout,
+            you’re in the right place.
+            <br />
+            <br />
+            Tap
+            <br />
+            Portfolio to see brand work, or Social Media on the channel knob to
+            see how it performs in the wild.
+          </p>
+        </div>
+      </section>
 
       <ImageLightbox
         open={lbOpen}
@@ -2139,17 +2286,48 @@ function MarketingContent() {
 
         <section id="pricing" className="mk-section">
           <h2 className="mk-h2">Core Strengths</h2>
+
           <p
             style={{
-              margin: "6px auto 0",
-              maxWidth: "720px",
+              margin: "8px auto 24px",
+              maxWidth: "760px",
               color: "var(--muted)",
-              font: "500 15px/1.7 Inter",
+              font: "500 16px/1.7 Inter",
             }}
           >
-            Fast, organized execution — with clean handoffs and consistent
-            visual output.
+            Creative execution backed by structure — built to move fast, stay
+            consistent, and scale across platforms.
           </p>
+
+          <div className="mk-strengthsGrid">
+            {[
+              {
+                title: "E-commerce Strategy & Performance",
+                body: "Using analytics to make data-informed decisions across Amazon and DTC — analyzing performance, audiences, and trends to evolve brand & product strategy.",
+              },
+              {
+                title: "Project Managment",
+                body: "Bridging creative, pre-production, post-production, and marketing to maintain communication, set milestones, meet deadlines, and work with vendors to ensure proper execution.",
+              },
+              {
+                title: "Visual Systems",
+                body: "Consistent brand visuals across PDPs, campaigns, social, and launch moments — not one-off assets.",
+              },
+              {
+                title: "Content That Ships",
+                body: "Fast turnaround & structured handoffs with assets deployed cleanly across platforms and refined using post-launch trends and analytics",
+              },
+              {
+                title: "Scalable Execution",
+                body: "Processes built for growth, whether it’s one product or an entire portfolio.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="mk-strength">
+                <h3 className="mk-strengthTitle">{item.title}</h3>
+                <p className="mk-strengthBody">{item.body}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
 
