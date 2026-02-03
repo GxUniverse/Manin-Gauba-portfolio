@@ -503,6 +503,12 @@ function CRTLayout({
     overflow:hidden;
     text-overflow: ellipsis;
   }
+/* ==========================
+   MOBILE: hide side tabs
+   ========================== */
+@media (max-width: 720px){
+  .sideDock{ display:none !important; }
+}
 
   /* ==========================
      CHANNEL KNOB STYLES
@@ -1340,6 +1346,77 @@ function CRTLayout({
     background: var(--outline-yellow);
     box-shadow: 0 0 10px rgba(255,216,77,.75), 0 0 22px rgba(255,216,77,.45);
   }
+    /* ==========================
+   MOBILE SCALE TWEAKS (HOME)
+   ========================== */
+@media (max-width: 720px){
+
+  /* 1) Home boot / hero video: zoom out slightly */
+  .h_bgVideo{
+    transform: scale(.92);
+    transform-origin: center center;
+  }
+
+  /* (optional) if your boot video uses .videoFill, scale that too */
+  .videoFill{
+    transform: scale(.92);
+    transform-origin: center center;
+  }
+
+  /* 2) SCROLL side controls: smaller + less intrusive */
+  .h_scroll{
+    gap:6px;
+    transform: translateY(-50%) scale(.82);
+  }
+
+  .h_plate{
+    padding:5px 8px;
+    border-radius:9px;
+  }
+
+  .h_sign{
+    font-size: 12px;
+    letter-spacing: .14em;
+  }
+
+  .h_arrow{
+    width:16px;
+    height:16px;
+    border-right-width:2px;
+    border-bottom-width:2px;
+  }
+
+  /* keep them tucked closer to the edges */
+  .h_scroll.left{ left: 8px; }
+  .h_scroll.right{ right: 8px; }
+}
+  /* ==========================
+   MOBILE: move volume control top-left
+   ========================== */
+@media (max-width: 720px){
+
+  .h_audioWrap{
+    top: clamp(10px, 3vw, 14px);
+    left: clamp(10px, 3vw, 14px);
+    right: auto;
+    bottom: auto;
+
+    padding: 6px 8px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .h_audioBtn{
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+
+  .h_audioSlider{
+    width: 90px; /* slightly shorter for mobile */
+  }
+}
+
+
   `;
 
   return (
@@ -1490,7 +1567,7 @@ function HomeContent() {
       caption: "Turning a few green walls into whole universes.",
     },
     {
-      src: asset("bday studio session.jpg"),
+      src: asset("bday studio session.png"),
       alt: "Birthday studio session",
       tag: "GALACTIC STUDIO SESSION: NEW JERSEY",
       caption: "Birthday candles, hard drives, and one more take.",
@@ -2392,13 +2469,14 @@ function GalleryContent() {
       span: "cg-span-4",
     },
     {
-      id: "bday-session",
+      id: "poster-3",
       type: "image",
-      src: asset("bday studio session.jpg"),
+      src: asset("Poster 3.png"),
       tag: "HOME",
-      title: "Birthday Session",
-      span: "cg-span-6",
+      title: "Poster 3",
+      span: "cg-span-4",
     },
+
     {
       id: "sxsw",
       type: "image",
@@ -2415,7 +2493,23 @@ function GalleryContent() {
       title: "Space Man",
       span: "cg-span-3",
     },
+    {
+      id: "poster-2",
+      type: "image",
+      src: asset("Poster 2.png"),
+      tag: "HOME",
+      title: "Poster 1",
+      span: "cg-span-4",
+    },
 
+    {
+      id: "bday-session",
+      type: "image",
+      src: asset("bday studio session.png"),
+      tag: "HOME",
+      title: "Birthday Session",
+      span: "cg-span-6",
+    },
     {
       id: "logo-eb",
       type: "image",
@@ -2439,15 +2533,6 @@ function GalleryContent() {
       tag: "BRAND",
       title: "Lands’ End Logo",
       span: "cg-span-4",
-    },
-
-    {
-      id: "eb-bf1",
-      type: "image",
-      src: asset("black friday 2025 v1.jpg"),
-      tag: "PORTFOLIO",
-      title: "Black Friday v1",
-      span: "cg-span-6",
     },
     {
       id: "eb-bf3",
