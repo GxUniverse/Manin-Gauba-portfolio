@@ -1112,7 +1112,12 @@ function CRTLayout({
   .mk-link:hover{ color: var(--text); }
   .mk-cta{ background: var(--accent); color: var(--accent-ink); border:1px solid #1dd86a; border-radius: 999px; padding:10px 16px; font: 700 14px/1 Inter; box-shadow: 0 8px 30px rgba(29,222,106,.25); text-decoration:none; }
 
-  .mk-hero{ display:grid; place-items:center; padding: 80px 0 12px; text-align:center; }
+  .mk-hero{
+  display:grid;
+  place-items:center;
+  padding: 80px 0 0;
+  text-align:center;
+}
   .mk-hero-inner{ width:var(--grid); display:grid; gap:14px; text-align:center; margin-inline:auto; }
   .mk-h1{ font: 800 clamp(32px,5.8vw,60px)/1.1 "Space Grotesk", Inter; letter-spacing:-.02em; margin:0; background: linear-gradient(180deg, #ffffff, #d8e3d9); color: transparent; background-clip:text; }
   .comicHead{ display:inline-block; font-family: "VT323", ui-monospace, monospace; text-transform: uppercase; letter-spacing: .08em; padding: .35em .55em .3em; background: #ffd84d; color: #111; border-radius: 12px; border: 3px solid #050505; box-shadow: 0 4px 0 #050505, 0 10px 26px rgba(0,0,0,.45); }
@@ -1245,13 +1250,24 @@ function CRTLayout({
     .mk-nav-inner{ flex-wrap:wrap; justify-content:center; }
   }
 
-  .mk-ctaRow{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin: 48px auto; }
+  .mk-ctaRow{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin: 34px auto 0;
+}
   .mk-btn{ background: var(--accent); color: var(--accent-ink); border:1px solid #1dd86a; padding:12px 16px; border-radius:12px; font: 700 14px/1 Inter; text-decoration:none; }
 
   .mk-section{ width:var(--grid); margin: 48px auto 0; padding-bottom:6px; text-align:center; overflow-x:hidden; }
   .mk-h2{ font: 800 clamp(22px,3vw,34px)/1.15 "Space Grotesk", Inter; letter-spacing:-.01em; margin:0 0 6px }
 
-  .mk-logoReelWrap{ margin-top: -50px; width: var(--grid); margin-left:auto; margin-right:auto; }
+  .mk-logoReelWrap{
+  margin-top: 48px;
+  width: var(--grid);
+  margin-left:auto;
+  margin-right:auto;
+}
   .mk-logoReelFrame{
     position: relative; width: 100%;
     height: clamp(220px, 34vh, 420px);
@@ -1274,6 +1290,116 @@ function CRTLayout({
   .mk-logoOverlayP{ margin: 10px auto 0; max-width: 72ch; color: color-mix(in oklab, var(--muted) 82%, white); font: 500 15px/1.7 Inter; text-shadow: 0 10px 30px rgba(0,0,0,.65); }
 
   .mk-brandsRow{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; align-items:stretch; margin-top:20px; }
+  .brandPopup{
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0,0,0,.88);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.brandPopupInner{
+  position: relative;
+  width: min(1300px, 96vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #000;
+  box-shadow: 0 30px 120px rgba(0,0,0,.95);
+  padding: 22px;
+}
+
+.brandPopupClose{
+  position: sticky;
+  top: 0;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(0,0,0,.78);
+  color: #fff;
+  font: 900 28px/1 Inter;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.brandPopupClose:hover{
+  filter: brightness(1.15);
+}
+
+.brandPopupTop{
+  text-align: left;
+  margin: 0 0 16px;
+  padding-right: 52px;
+}
+
+.brandPopupTitle{
+  margin: 0 0 8px;
+  font: 900 clamp(22px, 3vw, 34px)/1.1 "Space Grotesk", Inter;
+  color: var(--text);
+}
+
+.brandPopupBlurb{
+  margin: 0;
+  max-width: 760px;
+  font: 500 14px/1.7 Inter;
+  color: var(--muted);
+}
+
+.brandPopupGrid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.brandPopupMedia{
+  border-radius: 14px;
+  overflow: hidden;
+  background: #050607;
+  border: 1px solid #111722;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandPopupMedia img,
+.brandPopupMedia video{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (max-width: 980px){
+  .brandPopupGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .brandPopupInner{
+    padding: 14px;
+  }
+
+  .brandPopupGrid{
+    grid-template-columns: 1fr;
+  }
+
+  .brandPopupMedia{
+    min-height: 240px;
+  }
+}
   .mk-brandCard{
     background:#000;
     border:1px solid var(--mk-stroke);
@@ -2082,7 +2208,70 @@ function SocialMediaContent() {
     </>
   );
 }
+function BrandPopup({ brand, onClose }) {
+  useEffect(() => {
+    if (!brand) return;
 
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", onKey);
+    document.body.style.userSelect = "none";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.userSelect = "";
+    };
+  }, [brand, onClose]);
+
+  if (!brand) return null;
+
+  return (
+    <div
+      className="brandPopup"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${brand.name} gallery`}
+      onMouseDown={onClose}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      <div className="brandPopupInner" onMouseDown={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className="brandPopupClose"
+          onClick={onClose}
+          aria-label="Close gallery"
+        >
+          ×
+        </button>
+
+        <div className="brandPopupTop">
+          <h3 className="brandPopupTitle">{brand.name}</h3>
+          <p className="brandPopupBlurb">{brand.blurb}</p>
+        </div>
+
+        <div className="brandPopupGrid">
+          {brand.projects.map((p, idx) => (
+            <div key={idx} className="brandPopupMedia">
+              {p.type === "video" ? (
+                <video src={p.src} autoPlay loop muted playsInline />
+              ) : (
+                <img
+                  src={p.src}
+                  alt=""
+                  loading="lazy"
+                  draggable="false"
+                  onContextMenu={(e) => e.preventDefault()}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 /* =========================
    MARKETING (PORTFOLIO)
    ========================= */
@@ -2149,7 +2338,7 @@ function MarketingContent() {
     {
       id: "champion-kids",
       name: "Champion Kids",
-      logo: asset("champion logo.png"),
+      logo: asset("champion kids logo.png"),
       blurb:
         "Contributed to lookbooks and e-commerce imagery—helping maintain organized styling flow, consistent presentation, and clean handoff to post-production.",
       projects: [
@@ -2161,7 +2350,7 @@ function MarketingContent() {
     {
       id: "lands-end",
       name: "Lands' End",
-      logo: asset("lands end logo.jpeg"),
+      logo: asset("lands end logo.png"),
       blurb:
         "Produced and organized digital assets for lifestyle apparel—focused on accuracy, consistency across PDPs, and fast turnaround for weekly needs.",
       projects: [
@@ -2192,31 +2381,32 @@ function MarketingContent() {
         },
       ],
     },
+    {
+      id: "caval-cabinetry",
+      name: "Caval Cabinetry",
+      logo: asset("Caval Cabinetry Logo.png"),
+      blurb:
+        "Creative marketing, social content, photography direction, visual assets, and digital presentation work for cabinetry, interiors, and home transformation content.",
+      projects: [
+        { type: "image", src: asset("caval 1.jpg") },
+        { type: "image", src: asset("caval 2.jpg") },
+        { type: "image", src: asset("caval 3.jpg") },
+        { type: "image", src: asset("caval 4.jpg") },
+        { type: "image", src: asset("caval 5.jpg") },
+        { type: "image", src: asset("caval 6.jpg") },
+      ],
+    },
   ];
 
-  const [activeBrand, setActiveBrand] = useState(
-    brands.length ? brands[0].id : null,
-  );
-  const toggleBrand = (id) =>
-    setActiveBrand((prev) => (prev === id ? null : id));
-  const currentBrand = brands.find((b) => b.id === activeBrand) || null;
+  const [activeBrand, setActiveBrand] = useState(null);
 
-  // Lightbox state (MARKETING)
-  const [lbOpen, setLbOpen] = useState(false);
-  const [lbSrc, setLbSrc] = useState("");
-  const [lbAlt, setLbAlt] = useState("");
-
-  const openLightbox = (src, alt) => {
-    setLbSrc(src);
-    setLbAlt(alt || "Preview");
-    setLbOpen(true);
-  };
-  const closeLightbox = () => {
-    setLbOpen(false);
-    setLbSrc("");
-    setLbAlt("");
+  const openBrand = (brand) => {
+    setActiveBrand(brand);
   };
 
+  const closeBrand = () => {
+    setActiveBrand(null);
+  };
   return (
     <>
       <div className="mk-wrap" data-page="portfolio">
@@ -2229,6 +2419,10 @@ function MarketingContent() {
             <a className="mk-link" href="#brands">
               Experience
             </a>
+            <a className="mk-link" href="#brochures">
+              Brochures
+            </a>
+
             <a className="mk-link" href="#pricing">
               Core Strengths
             </a>
@@ -2305,59 +2499,108 @@ function MarketingContent() {
               <button
                 key={b.id}
                 type="button"
-                className={`mk-brandCard ${activeBrand === b.id ? "mk-brandCard--active" : ""}`}
-                onClick={() => toggleBrand(b.id)}
+                className="mk-brandCard"
+                onClick={() => openBrand(b)}
+                aria-label={`Open ${b.name} gallery`}
+                onContextMenu={(e) => e.preventDefault()}
               >
                 <div className="mk-brandLogoFrame">
-                  <img src={b.logo} alt={b.name} />
+                  <img
+                    src={b.logo}
+                    alt={b.name}
+                    draggable="false"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
                 </div>
+
                 <div className="mk-brandName">{b.name}</div>
               </button>
             ))}
           </div>
 
-          <div className="mk-brandDetailShell">
-            <div
-              className={`mk-brandDetail ${currentBrand ? "mk-brandDetail--open" : ""}`}
-            >
-              {currentBrand && (
-                <div className="mk-brandDetailInner">
-                  <div style={{ textAlign: "left" }}>
-                    <h3 className="mk-brandDetailTitle">{currentBrand.name}</h3>
-                    <p className="mk-brandDetailIntro">{currentBrand.blurb}</p>
-                  </div>
+          <BrandPopup brand={activeBrand} onClose={closeBrand} />
+        </section>
 
-                  <div className="mk-brandMediaRow">
-                    {currentBrand.projects.map((p, idx) => (
-                      <div
-                        key={idx}
-                        className={`mk-brandMedia ${p.type === "image" ? "mk-brandMedia--clickable" : ""}`}
-                        onClick={() =>
-                          p.type === "image" ? openLightbox(p.src, p.alt) : null
-                        }
-                        role={p.type === "image" ? "button" : undefined}
-                        tabIndex={p.type === "image" ? 0 : undefined}
-                        onKeyDown={(e) =>
-                          p.type === "image" &&
-                          (e.key === "Enter" || e.key === " ")
-                            ? openLightbox(p.src, p.alt)
-                            : null
-                        }
-                        aria-label={
-                          p.type === "image" ? `Open ${p.alt}` : undefined
-                        }
-                      >
-                        {p.type === "video" ? (
-                          <video src={p.src} autoPlay loop muted playsInline />
-                        ) : (
-                          <img src={p.src} alt={p.alt} />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* =========================
+    PROFESSIONAL BROCHURE DESIGN
+========================= */}
+
+        <section id="brochures" className="mk-section">
+          <h2 className="mk-h2">Professional Brochure Design</h2>
+
+          <p
+            style={{
+              margin: "8px auto 24px",
+              maxWidth: "760px",
+              color: "var(--muted)",
+              font: "500 16px/1.7 Inter",
+            }}
+          >
+            Professionally designed marketing brochures created to showcase
+            products, services, and brand identity through premium layouts,
+            photography, and visual storytelling.
+          </p>
+
+          <div className="mk-brandsRow">
+            <button
+              type="button"
+              className="mk-brandCard"
+              onClick={() =>
+                window.open(
+                  asset("Copy of Caval Cabinetry Brochure (1).pdf"),
+                  "_blank",
+                )
+              }
+            >
+              <div className="mk-brandLogoFrame">
+                <img
+                  src={asset("Caval Cabinetry Brochure Cover.jpg")}
+                  alt="Caval Cabinetry Brochure"
+                  draggable="false"
+                />
+              </div>
+
+              <div className="mk-brandName">Caval Cabinetry</div>
+            </button>
+
+            <button
+              type="button"
+              className="mk-brandCard"
+              onClick={() =>
+                window.open(
+                  asset("Lands End Shoratened Catalogue.pdf"),
+                  "_blank",
+                )
+              }
+            >
+              <div className="mk-brandLogoFrame">
+                <img
+                  src={asset("Lands End Shoratened Catalogue Cover.jpg")}
+                  alt="Caval Cabinetry Brochure 2"
+                  draggable="false"
+                />
+              </div>
+
+              <div className="mk-brandName">Lands End Catalogue</div>
+            </button>
+
+            <button
+              type="button"
+              className="mk-brandCard"
+              onClick={() =>
+                window.open(asset("GX Universe Comic.pdf"), "_blank")
+              }
+            >
+              <div className="mk-brandLogoFrame">
+                <img
+                  src={asset("GX Universe Comic Cover.jpg")}
+                  alt="GX Universe Comic"
+                  draggable="false"
+                />
+              </div>
+
+              <div className="mk-brandName">GX Universe Comic</div>
+            </button>
           </div>
         </section>
 
@@ -2407,13 +2650,6 @@ function MarketingContent() {
           </div>
         </section>
       </div>
-
-      <ImageLightbox
-        open={lbOpen}
-        src={lbSrc}
-        alt={lbAlt}
-        onClose={closeLightbox}
-      />
     </>
   );
 }
