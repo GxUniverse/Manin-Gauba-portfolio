@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   BrowserRouter,
@@ -1290,10 +1289,10 @@ function CRTLayout({
   .mk-logoOverlayP{ margin: 10px auto 0; max-width: 72ch; color: color-mix(in oklab, var(--muted) 82%, white); font: 500 15px/1.7 Inter; text-shadow: 0 10px 30px rgba(0,0,0,.65); }
 
   .mk-brandsRow{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; align-items:stretch; margin-top:20px; }
- .brandPopup{
+  .brandPopup{
   position: fixed;
   inset: 0;
-  z-index: 100000;
+  z-index: 3000;
   background: rgba(0,0,0,.88);
   display: grid;
   place-items: center;
@@ -1314,28 +1313,21 @@ function CRTLayout({
 }
 
 .brandPopupClose{
-  position: fixed;
-  top: calc(14px + env(safe-area-inset-top, 0px));
-  right: 14px;
-
+  position: sticky;
+  top: 0;
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 44px;
-  height: 44px;
-
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.22);
-  background: rgba(0,0,0,.92);
-
+  background: rgba(0,0,0,.78);
   color: #fff;
   font: 900 28px/1 Inter;
   cursor: pointer;
-
-  z-index: 100001;
-
-  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+  z-index: 2;
 }
 
 .brandPopupClose:hover{
@@ -2395,12 +2387,12 @@ function MarketingContent() {
       blurb:
         "Creative marketing, social content, photography direction, visual assets, and digital presentation work for cabinetry, interiors, and home transformation content.",
       projects: [
-        { type: "image", src: asset("caval 1.jpg") },
-        { type: "image", src: asset("caval 2.jpg") },
-        { type: "image", src: asset("caval 3.jpg") },
-        { type: "image", src: asset("caval 4.jpg") },
-        { type: "image", src: asset("caval 5.jpg") },
-        { type: "image", src: asset("caval 6.jpg") },
+        { type: "image", src: asset("Caval 1.jpg") },
+        { type: "image", src: asset("Caval 2.jpg") },
+        { type: "image", src: asset("Caval 3.jpg") },
+        { type: "image", src: asset("Caval 4.jpg") },
+        { type: "image", src: asset("Caval 5.jpg") },
+        { type: "image", src: asset("Caval 6.jpg") },
       ],
     },
   ];
@@ -2442,18 +2434,17 @@ function MarketingContent() {
         <section className="mk-hero">
           <div className="mk-hero-inner">
             <h1 className="mk-h1 comicHead">
-              Creative Content. Real Growth. Lasting Brands.
+              Creative Operations + Content That Ships.
             </h1>
 
             <ul className="mk-bullets" aria-label="What I bring">
               {[
-                "Creative Media Strategy & Management",
-                "Social Media Content Creation & Curation",
-                "Brand Consistency & Identity Allignment",
-                "Content Calendars & Campaign Management (daily posts, weekly updates, seasonal drops)",
-                "Photography & Short-Form Video Production",
                 "E-commerce Production & On-Set Support",
-                "Performance Analytics & Growth Optimization",
+                "Asset Management & Delivery Pipelines",
+                "Creative Direction & Visual Merch",
+                "Launch Support (seasonal drops, weekly updates)",
+                "Cross-Team Coordination (studio, styling, retouch, marketing)",
+                "Performance Mindset (speed, quality, consistency)",
               ].map((b) => (
                 <li key={b}>
                   <span className="dot" aria-hidden="true" />
@@ -2596,18 +2587,18 @@ function MarketingContent() {
               type="button"
               className="mk-brandCard"
               onClick={() =>
-                window.open(asset("GX Universe Comic.pdf"), "_blank")
+                window.open(asset("Gx Universe Comic.pdf"), "_blank")
               }
             >
               <div className="mk-brandLogoFrame">
                 <img
-                  src={asset("GX Universe Comic Cover.jpg")}
+                  src={asset("Gx Universe Comic Cover.jpg")}
                   alt="GX Universe Comic"
                   draggable="false"
                 />
               </div>
 
-              <div className="mk-brandName">GX Universe Comic</div>
+              <div className="mk-brandName">Gx Universe Comic</div>
             </button>
           </div>
         </section>
@@ -2808,62 +2799,303 @@ function GalleryContent() {
       type: "image",
       src: asset("eb 2.jpg"),
       tag: "Fashion/Apparel Shoots",
-      title: "Eddie Bauer Kids Shoot",
-tudio Sessions (NJ)",
-      span: "cg-span-6",
+      title: "Eddie Bauer Kids Shoo",
+      span: "cg-span-3",
     },
     {
-      id: "logo-eb",
+      id: "eb-3",
       type: "image",
-      src: asset("eddie bauer kids logo.png"),
-      tag: "Marketing",
-      title: "Eddie Bauer Kids Logo",
-      span: "cg-span-4",
-    },
-    {
-      id: "logo-champ",
-      type: "image",
-      src: asset("champion logo.png"),
-      tag: "Marketing",
-      title: "Champion Logo",
-      span: "cg-span-4",
-    },
-    {
-      id: "logo-le",
-      type: "image",
-      src: asset("lands end logo.jpeg"),
-      tag: "Marketing",
-      title: "Lands’ End Logo",
-      span: "cg-span-4",
-    },
-    {
-      id: "eb-bf3",
-      type: "image",
-      src: asset("black friday 2025 v3.jpg"),
-      tag: "Marketing",
-      title: "Black Friday Lands End Ad",
-      span: "cg-span-6",
-    },
-    {
-      id: "eb-cm1",
-      type: "image",
-      src: asset("cyber Monday v1.jpg"),
-      tag: "Marketing",
-      title: "Cyber Monday Lands End Ad",
-      span: "cg-span-6",
-    },
-
-    {
-      id: "eb-1",
-      type: "image",
-      src: asset("eb 1.jpg"),
+      src: asset("eb 3.jpg"),
       tag: "Fashion/Apparel Shoots",
       title: "Eddie Bauer Kids Shoot",
       span: "cg-span-3",
     },
     {
-      id: "eb-2",
+      id: "eb-4",
       type: "image",
-      src: asset("eb 2.jpg"),
+      src: asset("eb 4.jpg"),
       tag: "Fashion/Apparel Shoots",
-      title: "Eddie Bauer Kids Shoo",
+      title: "Eddie Bauer Kids Shoot",
+      span: "cg-span-3",
+    },
+    {
+      id: "eb-5",
+      type: "image",
+      src: asset("eb 5.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Eddie Bauer Kids Shoot",
+      span: "cg-span-3",
+    },
+    {
+      id: "eb-6",
+      type: "image",
+      src: asset("eb 6.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Eddie Bauer Kids Shoot",
+      span: "cg-span-3",
+    },
+
+    {
+      id: "ch-1",
+      type: "image",
+      src: asset("champs 1.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Champion Kids Shoot",
+      span: "cg-span-4",
+    },
+    {
+      id: "ch-2",
+      type: "image",
+      src: asset("champs 2.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Champion Kids Shoot",
+      span: "cg-span-4",
+    },
+    {
+      id: "ch-3",
+      type: "image",
+      src: asset("champs 3.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Champion Kids Shoot",
+      span: "cg-span-4",
+    },
+
+    {
+      id: "le-email2",
+      type: "image",
+      src: asset("lands end email ad v2.jpg"),
+      tag: "Marketing",
+      title: "Lands’ End Email Ad",
+      span: "cg-span-6",
+    },
+    {
+      id: "le-email3",
+      type: "image",
+      src: asset("lands end email ad v3.jpg"),
+      tag: "Marketing",
+      title: "Lands’ End Email Ad",
+      span: "cg-span-6",
+    },
+    {
+      id: "le-email",
+      type: "image",
+      src: asset("lands end email ad.jpg"),
+      tag: "Marketing",
+      title: "Lands’ End Email Ad",
+      span: "cg-span-4",
+    },
+    {
+      id: "le-shoot1",
+      type: "image",
+      src: asset("LE shoot 1.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Lands’ End Kids Shoot",
+      span: "cg-span-4",
+    },
+    {
+      id: "le-shoot2",
+      type: "image",
+      src: asset("LE shoot 2.jpg"),
+      tag: "Fashion/Apparel Shoots",
+      title: "Lands’ End Kids Shoot",
+      span: "cg-span-4",
+    },
+  ];
+
+  const FILTERS = [
+    "ALL",
+    "Recording Studio",
+    "Fashion/Apparel Shoots",
+    "Marketing",
+    "Animation",
+  ];
+  const [filter, setFilter] = useState("ALL");
+  const [active, setActive] = useState(null);
+
+  const filtered = MEDIA.filter((m) => filter === "ALL" || m.tag === filter);
+
+  const open = (m) => setActive(m);
+  const close = () => setActive(null);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  return (
+    <div className="cg-wrap">
+      <section className="cg-hero">
+        <div className="cg-hero-inner">
+          <h1 className="cg-h1">Gallery</h1>
+          <p className="cg-sub">
+            Click anything to view it larger. (Videos open with controls.)
+          </p>
+        </div>
+      </section>
+
+      <div className="cg-shell">
+        <div className="cg-controls">
+          <div
+            className="cg-pillRow"
+            role="tablist"
+            aria-label="Gallery filters"
+          >
+            {FILTERS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                className={`cg-pill ${filter === f ? "active" : ""}`}
+                onClick={() => setFilter(f)}
+                role="tab"
+                aria-selected={filter === f}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          <div className="cg-count">
+            Showing <strong>{filtered.length}</strong> item
+            {filtered.length === 1 ? "" : "s"}
+          </div>
+        </div>
+
+        <div className="cg-grid" aria-label="Gallery media grid">
+          {filtered.map((m) => (
+            <div
+              key={m.id}
+              className={`cg-card ${m.span || "cg-span-4"}`}
+              onClick={() => open(m)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) =>
+                e.key === "Enter" || e.key === " " ? open(m) : null
+              }
+              aria-label={`Open ${m.title}`}
+              title="Click to view"
+            >
+              {m.type === "video" ? (
+                <video
+                  className="cg-media"
+                  src={m.src}
+                  muted
+                  playsInline
+                  autoPlay
+                  loop
+                />
+              ) : (
+                <img
+                  className="cg-media"
+                  src={m.src}
+                  alt={m.title}
+                  loading="lazy"
+                />
+              )}
+
+              <div className="cg-overlay">
+                <p className="cg-tag">{m.tag}</p>
+                <p className="cg-title">{m.title}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {active && (
+        <div
+          className="cg-lightbox"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={close}
+        >
+          <div
+            className="cg-lightboxInner"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <div className="cg-lightboxTop">
+              <div className="cg-lightboxTopLeft">
+                <p className="cg-lightboxKicker">{active.tag}</p>
+                <p className="cg-lightboxTitle">{active.title}</p>
+              </div>
+              <button type="button" className="cg-close" onClick={close}>
+                CLOSE
+              </button>
+            </div>
+
+            <div className="cg-lightboxMedia">
+              {active.type === "video" ? (
+                <video src={active.src} controls autoPlay playsInline />
+              ) : (
+                <img src={active.src} alt={active.title} />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================
+   ROUTES
+   ========================= */
+function HomePageBoot() {
+  return (
+    <CRTLayout showPower bootSrc={HOME_LOGO_VIDEO} mode="scroll">
+      <HomeContent />
+    </CRTLayout>
+  );
+}
+
+function HomePageWarm() {
+  return (
+    <CRTLayout mode="scroll">
+      <HomeContent />
+    </CRTLayout>
+  );
+}
+
+function MarketingPage() {
+  return (
+    <CRTLayout mode="scroll">
+      <MarketingContent />
+    </CRTLayout>
+  );
+}
+
+function SocialMediaPage() {
+  return (
+    <CRTLayout mode="scroll">
+      <SocialMediaContent />
+    </CRTLayout>
+  );
+}
+
+function GalleryPage() {
+  return (
+    <CRTLayout mode="scroll">
+      <GalleryContent />
+    </CRTLayout>
+  );
+}
+
+/* =========================
+   APP
+   ========================= */
+export default function App() {
+  return (
+    <BrowserRouter basename={process.env.PUBLIC_URL || ""}>
+      <Routes>
+        <Route path="/" element={<HomePageBoot />} />
+        <Route path="/home" element={<HomePageWarm />} />
+        <Route path="/marketing" element={<MarketingPage />} />
+        <Route path="/Gallery" element={<GalleryPage />} />
+        <Route path="/social-media" element={<SocialMediaPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
