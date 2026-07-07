@@ -1999,7 +1999,7 @@ function HomeContent() {
    ========================= */
 function SocialMediaContent() {
   useEffect(() => {
-    document.title = "Social Media — GX Universe";
+    document.title = "Social Media — Gx Universe";
   }, []);
 
   const IG_POSTS = [
@@ -2276,7 +2276,7 @@ function BrandPopup({ brand, onClose }) {
    ========================= */
 function MarketingContent() {
   useEffect(() => {
-    document.title = "Portfolio — GX Universe";
+    document.title = "Portfolio — Gx Universe";
   }, []);
 
   const brands = [
@@ -2592,8 +2592,8 @@ function MarketingContent() {
             >
               <div className="mk-brandLogoFrame">
                 <img
-                  src={asset("Gx Universe Comic Cover.jpg")}
-                  alt="GX Universe Comic"
+                  src={asset("Gx Universe Comic Cover.JPG")}
+                  alt="Gx Universe Comic"
                   draggable="false"
                 />
               </div>
@@ -2658,7 +2658,7 @@ function MarketingContent() {
    ========================= */
 function GalleryContent() {
   useEffect(() => {
-    document.title = "Gallery — GX Universe";
+    document.title = "Gallery — Gx Universe";
   }, []);
 
   const MEDIA = [
