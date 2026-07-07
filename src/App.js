@@ -2592,7 +2592,7 @@ function MarketingContent() {
             >
               <div className="mk-brandLogoFrame">
                 <img
-                  src={asset("Gx Universe Comic Cover.jpg")}
+                  src={asset("Gx Universe Comic Cover.PNG")}
                   alt="Gx Universe Comic"
                   draggable="false"
                 />
