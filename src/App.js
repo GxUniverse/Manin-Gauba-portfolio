@@ -2582,7 +2582,6 @@ function MarketingContent() {
 
               <div className="mk-brandName">Lands End Catalogue</div>
             </button>
-
             <button
               type="button"
               className="mk-brandCard"
@@ -2592,8 +2591,8 @@ function MarketingContent() {
             >
               <div className="mk-brandLogoFrame">
                 <img
-                  src={asset("Gx Universe Comic Cover.JPG")}
-                  alt="Gx Universe Comic"
+                  src={asset("Gx Universe Comic Cover.jpg")}
+                  alt="Caval Cabinetry Brochure 2"
                   draggable="false"
                 />
               </div>
