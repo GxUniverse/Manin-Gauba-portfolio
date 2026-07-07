@@ -2800,7 +2800,7 @@ function GalleryContent() {
       type: "image",
       src: asset("eb 2.jpg"),
       tag: "Fashion/Apparel Shoots",
-      title: "Eddie Bauer Kids Shoot",
+      title: "Eddie Bauer Kids Shoo",
       span: "cg-span-3",
     },
     {
