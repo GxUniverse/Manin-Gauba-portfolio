@@ -2580,7 +2580,7 @@ function MarketingContent() {
                 />
               </div>
 
-              <div className="mk-brandName">Lands End Catalogue</div>
+              <div className="mk-brandName">Lands End Cataloge</div>
             </button>
 
             <button
