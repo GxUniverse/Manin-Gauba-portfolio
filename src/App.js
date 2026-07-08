@@ -1120,7 +1120,117 @@ function CRTLayout({
   .mk-hero-inner{ width:var(--grid); display:grid; gap:14px; text-align:center; margin-inline:auto; }
   .mk-h1{ font: 800 clamp(32px,5.8vw,60px)/1.1 "Space Grotesk", Inter; letter-spacing:-.02em; margin:0; background: linear-gradient(180deg, #ffffff, #d8e3d9); color: transparent; background-clip:text; }
   .comicHead{ display:inline-block; font-family: "VT323", ui-monospace, monospace; text-transform: uppercase; letter-spacing: .08em; padding: .35em .55em .3em; background: #ffd84d; color: #111; border-radius: 12px; border: 3px solid #050505; box-shadow: 0 4px 0 #050505, 0 10px 26px rgba(0,0,0,.45); }
-/* ===== CORE STRENGTHS GRID (3 TOP / 2 BOTTOM — FIXED) ===== */
+.mk-heroSub{
+  max-width:820px;
+  margin:10px auto 0;
+  color:var(--muted);
+  font:600 16px/1.7 Inter;
+}
+
+.mk-servicesGrid{
+  width:var(--grid);
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:22px;
+  margin:36px auto 0;
+}
+
+.mk-serviceColumn{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(29,222,106,.18), transparent 35%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:24px;
+  padding:22px;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.75),
+    inset 0 1px 0 rgba(255,255,255,.16);
+  backdrop-filter:blur(10px);
+  transform:translateY(0);
+  animation:mkFloat 4.8s ease-in-out infinite;
+}
+
+.mk-serviceColumn:nth-child(2){ animation-delay:.35s; }
+.mk-serviceColumn:nth-child(3){ animation-delay:.7s; }
+
+.mk-serviceColumn::before{
+  content:"";
+  position:absolute;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  right:-55px;
+  top:-65px;
+  background:radial-gradient(circle, rgba(255,216,77,.22), transparent 70%);
+  animation:mkBubble 7s ease-in-out infinite;
+}
+
+.mk-serviceColumn::after{
+  content:"";
+  position:absolute;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  left:-28px;
+  bottom:-30px;
+  background:radial-gradient(circle, rgba(29,222,106,.2), transparent 70%);
+  animation:mkBubble 6s ease-in-out infinite reverse;
+}
+
+@keyframes mkFloat{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-8px); }
+}
+
+@keyframes mkBubble{
+  0%,100%{ transform:translate(0,0) scale(1); opacity:.75; }
+  50%{ transform:translate(-12px,18px) scale(1.15); opacity:1; }
+}
+
+.mk-serviceTitle{
+  position:relative;
+  z-index:1;
+  display:inline-block;
+  margin:0 0 16px;
+  padding:8px 12px 7px;
+  background:#ffd84d;
+  color:#111;
+  border:3px solid #050505;
+  border-radius:12px;
+  box-shadow:0 4px 0 #050505;
+  font:900 13px/1.15 "Space Grotesk", Inter;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.mk-serviceColumn .mk-bullets{
+  position:relative;
+  z-index:1;
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:13px;
+}
+
+.mk-serviceColumn .mk-bullets li{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  text-align:left;
+  color:var(--text);
+  font:700 15px/1.55 Inter;
+}
+
+@media (max-width:980px){
+  .mk-servicesGrid{
+    grid-template-columns:1fr;
+  }
+}
+  /* ===== CORE STRENGTHS GRID (3 TOP / 2 BOTTOM — FIXED) ===== */
 .mk-strengthsGrid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1288,11 +1398,92 @@ function CRTLayout({
   .mk-logoOverlayH2{ margin:0; font: 800 clamp(24px, 3.2vw, 38px)/1.15 "Space Grotesk", Inter; letter-spacing:-.01em; color: var(--text); text-shadow: 0 10px 34px rgba(0,0,0,.65); }
   .mk-logoOverlayP{ margin: 10px auto 0; max-width: 72ch; color: color-mix(in oklab, var(--muted) 82%, white); font: 500 15px/1.7 Inter; text-shadow: 0 10px 30px rgba(0,0,0,.65); }
 
-  .mk-brandsRow{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; align-items:stretch; margin-top:20px; }
-  .brandPopup{
+.mk-brandsRow{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:18px;
+  margin-top:20px;
+}
+
+.mk-brandCarouselShell{
+  position:relative;
+  width:100%;
+  margin-top:20px;
+}
+
+.mk-brandsCarousel{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+
+  padding:8px 54px 16px;
+  scrollbar-width:none;
+}
+
+.mk-brandsCarousel::-webkit-scrollbar{
+  display:none;
+}
+
+.mk-brandsCarousel .mk-brandCard{
+  flex:0 0 clamp(220px, 24vw, 300px);
+  scroll-snap-align:center;
+}
+
+.mk-brandArrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:5;
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.82);
+  color:#fff;
+  font:900 34px/1 Inter;
+  cursor:pointer;
+  box-shadow:0 12px 34px rgba(0,0,0,.65);
+}
+
+.mk-brandArrow:hover{
+  filter:brightness(1.15);
+}
+
+.mk-brandArrowLeft{
+  left:4px;
+}
+
+.mk-brandArrowRight{
+  right:4px;
+}
+
+@media (max-width:640px){
+  .mk-brandsCarousel{
+    padding:8px 44px 16px;
+  }
+
+  .mk-brandsCarousel .mk-brandCard{
+    flex-basis:78%;
+  }
+
+  .mk-brandArrow{
+    width:38px;
+    height:38px;
+    font-size:28px;
+  }
+}
+.brandPopup{
   position: fixed;
   inset: 0;
-  z-index: 3000;
+  z-index: 100000;
   background: rgba(0,0,0,.88);
   display: grid;
   place-items: center;
@@ -1313,21 +1504,28 @@ function CRTLayout({
 }
 
 .brandPopupClose{
-  position: sticky;
-  top: 0;
-  margin-left: auto;
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  right: 14px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+
+  width: 44px;
+  height: 44px;
+
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.22);
-  background: rgba(0,0,0,.78);
+  background: rgba(0,0,0,.92);
+
   color: #fff;
   font: 900 28px/1 Inter;
   cursor: pointer;
-  z-index: 2;
+
+  z-index: 100001;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
 }
 
 .brandPopupClose:hover{
@@ -2279,6 +2477,21 @@ function MarketingContent() {
     document.title = "Portfolio — Gx Universe";
   }, []);
 
+  const brandRowRef = useRef(null);
+
+  const scrollBrands = (dir) => {
+    const el = brandRowRef.current;
+    if (!el) return;
+
+    const firstCard = el.querySelector(".mk-brandCard");
+    const cardW = firstCard ? firstCard.getBoundingClientRect().width : 260;
+
+    el.scrollBy({
+      left: dir * (cardW + 18) * 2,
+      behavior: "smooth",
+    });
+  };
+
   const brands = [
     {
       id: "eddie-bauer",
@@ -2395,6 +2608,42 @@ function MarketingContent() {
         { type: "image", src: asset("Caval 6.jpg") },
       ],
     },
+
+    {
+      id: "underground-violet-rave",
+      name: "Underground Violet Rave",
+      logo: asset("Underground Violet Rave Logo.png"),
+      blurb:
+        "Created and developed the complete visual identity for Underground Violet Rave, including logo design, event branding, promotional graphics, merchandise, digital marketing assets, and creative direction.",
+
+      projects: [
+        {
+          type: "image",
+          src: asset("Underground Violet Rave 1.jpg"),
+          alt: "Underground Violet Rave logo",
+        },
+        {
+          type: "image",
+          src: asset("Underground Violet Rave 2.png"),
+          alt: "Underground Violet Rave branding",
+        },
+        {
+          type: "image",
+          src: asset("Underground Violet Rave 3.png"),
+          alt: "Underground Violet Rave branding",
+        },
+        {
+          type: "image",
+          src: asset("Underground Violet Rave Logo.png"),
+          alt: "Underground Violet Rave branding",
+        },
+        {
+          type: "image",
+          src: asset("Underground Violet Rave 4.png"),
+          alt: "Underground Violet Rave branding",
+        },
+      ],
+    },
   ];
 
   const [activeBrand, setActiveBrand] = useState(null);
@@ -2434,24 +2683,56 @@ function MarketingContent() {
         <section className="mk-hero">
           <div className="mk-hero-inner">
             <h1 className="mk-h1 comicHead">
-              Creative Operations + Content That Ships.
+              Creative Content. Real Growth. Lasting Brands.
             </h1>
 
-            <ul className="mk-bullets" aria-label="What I bring">
+            <p className="mk-heroSub">
+              A creative media agency helping brands grow through strategy,
+              social media, content production, AI-enhanced workflows, and
+              data-driven optimization.
+            </p>
+
+            <div className="mk-servicesGrid">
               {[
-                "E-commerce Production & On-Set Support",
-                "Asset Management & Delivery Pipelines",
-                "Creative Direction & Visual Merch",
-                "Launch Support (seasonal drops, weekly updates)",
-                "Cross-Team Coordination (studio, styling, retouch, marketing)",
-                "Performance Mindset (speed, quality, consistency)",
-              ].map((b) => (
-                <li key={b}>
-                  <span className="dot" aria-hidden="true" />
-                  <span>{b}</span>
-                </li>
+                {
+                  title: "Social Media & Brand Growth",
+                  items: [
+                    "Creative Media Strategy & Management",
+                    "Social Media Content Creation & Curation",
+                    "Brand Consistency & Identity Alignment",
+                  ],
+                },
+                {
+                  title: "Content Production",
+                  items: [
+                    "Photography & Short-Form Video Production",
+                    "Commercial Content Production",
+                    "Content Planning & Campaign Execution",
+                  ],
+                },
+                {
+                  title: "AI, E-Commerce & Growth",
+                  items: [
+                    "AI-Enhanced Creative Workflows & Automation",
+                    "AI-Powered Content Ideation & Optimization",
+                    "E-Commerce Content & Product Marketing",
+                  ],
+                },
+              ].map((group) => (
+                <div className="mk-serviceColumn" key={group.title}>
+                  <h3 className="mk-serviceTitle">{group.title}</h3>
+
+                  <ul className="mk-bullets">
+                    {group.items.map((b) => (
+                      <li key={b}>
+                        <span className="dot" aria-hidden="true" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
 
             <div className="mk-ctaRow">
               <a className="mk-btn" href="mailto:ManinDGauba@gmail.com">
@@ -2493,28 +2774,48 @@ function MarketingContent() {
             </div>
           </div>
 
-          <div className="mk-brandsRow">
-            {brands.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                className="mk-brandCard"
-                onClick={() => openBrand(b)}
-                aria-label={`Open ${b.name} gallery`}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                <div className="mk-brandLogoFrame">
-                  <img
-                    src={b.logo}
-                    alt={b.name}
-                    draggable="false"
-                    onContextMenu={(e) => e.preventDefault()}
-                  />
-                </div>
+          <div className="mk-brandCarouselShell">
+            <button
+              type="button"
+              className="mk-brandArrow mk-brandArrowLeft"
+              onClick={() => scrollBrands(-1)}
+              aria-label="Previous brands"
+            >
+              ‹
+            </button>
 
-                <div className="mk-brandName">{b.name}</div>
-              </button>
-            ))}
+            <div className="mk-brandsRow mk-brandsCarousel" ref={brandRowRef}>
+              {brands.map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  className="mk-brandCard"
+                  onClick={() => openBrand(b)}
+                  aria-label={`Open ${b.name} gallery`}
+                  onContextMenu={(e) => e.preventDefault()}
+                >
+                  <div className="mk-brandLogoFrame">
+                    <img
+                      src={b.logo}
+                      alt={b.name}
+                      draggable="false"
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                  </div>
+
+                  <div className="mk-brandName">{b.name}</div>
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="mk-brandArrow mk-brandArrowRight"
+              onClick={() => scrollBrands(1)}
+              aria-label="Next brands"
+            >
+              ›
+            </button>
           </div>
 
           <BrandPopup brand={activeBrand} onClose={closeBrand} />
@@ -2599,7 +2900,7 @@ function MarketingContent() {
                 />
               </div>
 
-              <div className="mk-brandName">Gx Universe Comic</div>
+              <div className="mk-brandName">The Adventures of G & X</div>
             </button>
           </div>
         </section>
