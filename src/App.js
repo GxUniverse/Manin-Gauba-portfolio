@@ -1483,49 +1483,56 @@ function CRTLayout({
 .brandPopup{
   position: fixed;
   inset: 0;
-  z-index: 100000;
-  background: rgba(0,0,0,.88);
+  z-index: 9999999;
+  isolation: isolate;
+  background: rgba(0,0,0,.92);
   display: grid;
   place-items: center;
-  padding: 18px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .brandPopupInner{
   position: relative;
+  z-index: 1;
   width: min(1300px, 96vw);
-  max-height: 88vh;
+  height: min(88dvh, 900px);
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,.14);
   background: #000;
   box-shadow: 0 30px 120px rgba(0,0,0,.95);
-  padding: 22px;
+  padding: 18px;
 }
 
 .brandPopupClose{
-  position: fixed;
-  top: calc(14px + env(safe-area-inset-top, 0px));
-  right: 14px;
+  position: sticky;
+  top: 0;
+  margin-left: auto;
+  margin-bottom: 10px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
 
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.22);
-  background: rgba(0,0,0,.92);
+  border: 1px solid rgba(255,255,255,.28);
+  background: rgba(0,0,0,.96);
 
   color: #fff;
-  font: 900 28px/1 Inter;
+  font: 900 30px/1 Inter;
   cursor: pointer;
 
-  z-index: 100001;
+  z-index: 10;
 
-  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,.75);
 }
 
 .brandPopupClose:hover{
@@ -1535,7 +1542,6 @@ function CRTLayout({
 .brandPopupTop{
   text-align: left;
   margin: 0 0 16px;
-  padding-right: 52px;
 }
 
 .brandPopupTitle{
@@ -1585,8 +1591,22 @@ function CRTLayout({
 }
 
 @media (max-width: 640px){
+  .brandPopup{
+    place-items: start center;
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
   .brandPopupInner{
-    padding: 14px;
+    width: 100%;
+    height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .brandPopupClose{
+    width: 48px;
+    height: 48px;
+    font-size: 32px;
   }
 
   .brandPopupGrid{
@@ -1594,7 +1614,7 @@ function CRTLayout({
   }
 
   .brandPopupMedia{
-    min-height: 240px;
+    min-height: 260px;
   }
 }
   .mk-brandCard{
