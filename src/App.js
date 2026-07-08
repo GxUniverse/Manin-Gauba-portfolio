@@ -2521,6 +2521,7 @@ function MarketingContent() {
         </section>
 
         {/* =========================
+   {/* =========================
     PROFESSIONAL BROCHURE DESIGN
 ========================= */}
 
@@ -2575,12 +2576,12 @@ function MarketingContent() {
               <div className="mk-brandLogoFrame">
                 <img
                   src={asset("Lands End Shoratened Catalogue Cover.jpg")}
-                  alt="Caval Cabinetry Brochure 2"
+                  alt="Lands End Catalogue"
                   draggable="false"
                 />
               </div>
 
-              <div className="mk-brandName">Lands End Cataloge</div>
+              <div className="mk-brandName">Lands End Catalogue</div>
             </button>
 
             <button
@@ -2592,7 +2593,7 @@ function MarketingContent() {
             >
               <div className="mk-brandLogoFrame">
                 <img
-                  src={asset("Gx Universe Comic Cover.PNG")}
+                  src={asset("Gx Universe Comic Cover.png")}
                   alt="Gx Universe Comic"
                   draggable="false"
                 />
@@ -2619,33 +2620,50 @@ function MarketingContent() {
           </p>
 
           <div className="mk-strengthsGrid">
-            {[
-              {
-                title: "E-commerce Strategy & Performance",
-                body: "Using analytics to make data-informed decisions across Amazon and DTC — analyzing performance, audiences, and trends to evolve brand & product strategy.",
-              },
-              {
-                title: "Project Managment",
-                body: "Bridging creative, pre-production, post-production, and marketing to maintain communication, set milestones, meet deadlines, and work with vendors to ensure proper execution.",
-              },
-              {
-                title: "Visual Systems",
-                body: "Consistent brand visuals across PDPs, campaigns, social, and launch moments — not one-off assets.",
-              },
-              {
-                title: "Content That Ships",
-                body: "Fast turnaround & structured handoffs with assets deployed cleanly across platforms and refined using post-launch trends and analytics",
-              },
-              {
-                title: "Scalable Execution",
-                body: "Processes built for growth, whether it’s one product or an entire portfolio.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="mk-strength">
-                <h3 className="mk-strengthTitle">{item.title}</h3>
-                <p className="mk-strengthBody">{item.body}</p>
-              </div>
-            ))}
+            <div className="mk-strength">
+              <h3 className="mk-strengthTitle">
+                E-commerce Strategy & Performance
+              </h3>
+              <p className="mk-strengthBody">
+                Using analytics to make data-informed decisions across Amazon
+                and DTC — analyzing performance, audiences, and trends to evolve
+                brand & product strategy.
+              </p>
+            </div>
+
+            <div className="mk-strength">
+              <h3 className="mk-strengthTitle">Project Management</h3>
+              <p className="mk-strengthBody">
+                Bridging creative, pre-production, post-production, and
+                marketing to maintain communication, set milestones, meet
+                deadlines, and work with vendors to ensure proper execution.
+              </p>
+            </div>
+
+            <div className="mk-strength">
+              <h3 className="mk-strengthTitle">Visual Systems</h3>
+              <p className="mk-strengthBody">
+                Consistent brand visuals across PDPs, campaigns, social, and
+                launch moments — not one-off assets.
+              </p>
+            </div>
+
+            <div className="mk-strength">
+              <h3 className="mk-strengthTitle">Content That Ships</h3>
+              <p className="mk-strengthBody">
+                Fast turnaround & structured handoffs with assets deployed
+                cleanly across platforms and refined using post-launch trends
+                and analytics.
+              </p>
+            </div>
+
+            <div className="mk-strength">
+              <h3 className="mk-strengthTitle">Scalable Execution</h3>
+              <p className="mk-strengthBody">
+                Processes built for growth, whether it’s one product or an
+                entire portfolio.
+              </p>
+            </div>
           </div>
         </section>
       </div>
