@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   BrowserRouter,
   Routes,
@@ -1510,10 +1511,11 @@ function CRTLayout({
 }
 
 .brandPopupClose{
-  position: sticky;
-  top: 0;
-  margin-left: auto;
-  margin-bottom: 10px;
+  position: fixed;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  right: 18px;
+  z-index: 2147483647;
+}
 
   display: flex;
   align-items: center;
@@ -2434,26 +2436,32 @@ function BrandPopup({ brand, onClose }) {
     };
 
     window.addEventListener("keydown", onKey);
+
+    const previousOverflow = document.body.style.overflow;
+    const previousUserSelect = document.body.style.userSelect;
+
+    document.body.style.overflow = "hidden";
     document.body.style.userSelect = "none";
 
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.userSelect = "";
+      document.body.style.overflow = previousOverflow;
+      document.body.style.userSelect = previousUserSelect;
     };
   }, [brand, onClose]);
 
   if (!brand) return null;
 
-  return (
+  return createPortal(
     <div
       className="brandPopup"
       role="dialog"
       aria-modal="true"
       aria-label={`${brand.name} gallery`}
-      onMouseDown={onClose}
+      onClick={onClose}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <div className="brandPopupInner" onMouseDown={(e) => e.stopPropagation()}>
+      <div className="brandPopupInner" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           className="brandPopupClose"
@@ -2486,7 +2494,8 @@ function BrandPopup({ brand, onClose }) {
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 /* =========================
