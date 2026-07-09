@@ -2230,7 +2230,7 @@ function SocialMediaContent() {
       caption: "Hook + cutdowns that keep the drop alive after day one.",
     },
     {
-      thumb: "UVR.png",
+      thumb: "Underground Violet Rave 5.png",
       url: "https://www.instagram.com/reel/C124tqQOUbp/",
       tag: "Large Scale Event Hosting - UVR Miami",
       caption: "Consistent visual system across posts, covers, and typography.",
@@ -2686,12 +2686,12 @@ function MarketingContent() {
   };
   return (
     <>
-      <div className="mk-wrap" data-page="portfolio">
+      <div id="top" className="mk-wrap" data-page="portfolio">
         <div className="mk-nav">
           <div className="mk-nav-inner">
-            <Link className="mk-home" to="/home">
-              Home
-            </Link>
+            <a className="mk-home" href="#top">
+              Gx Universe
+            </a>
             <div className="mk-spacer" />
             <a className="mk-link" href="#brands">
               Experience
