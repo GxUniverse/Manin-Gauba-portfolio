@@ -2918,7 +2918,7 @@ function MarketingContent() {
               type="button"
               className="mk-brandCard"
               onClick={() =>
-                window.open(asset("Gx Universe Comic.pdf"), "_blank")
+                window.open(asset("The Adventures oF G & X.PDF"), "_blank")
               }
             >
               <div className="mk-brandLogoFrame">
