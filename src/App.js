@@ -2918,7 +2918,7 @@ function MarketingContent() {
               type="button"
               className="mk-brandCard"
               onClick={() =>
-                window.open(asset("The Adventures oF G & X.PDF"), "_blank")
+                window.open(asset("Adventures of g & x.PDF"), "_blank")
               }
             >
               <div className="mk-brandLogoFrame">
