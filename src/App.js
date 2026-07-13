@@ -2913,6 +2913,23 @@ function MarketingContent() {
 
               <div className="mk-brandName">Lands End Catalogue</div>
             </button>
+            <button
+              type="button"
+              className="mk-brandCard"
+              onClick={() =>
+                window.open(asset("Adventures of g & x.pdf"), "_blank")
+              }
+            >
+              <div className="mk-brandLogoFrame">
+                <img
+                  src={asset("Gx Universe Comic Cover.png")}
+                  alt="Lands End Catalogue"
+                  draggable="false"
+                />
+              </div>
+
+              <div className="mk-brandName">Lands End Catalogue</div>
+            </button>
 
             <button
               type="button"
